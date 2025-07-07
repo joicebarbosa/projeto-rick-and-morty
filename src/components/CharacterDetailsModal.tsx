@@ -1,15 +1,13 @@
 // src/components/CharacterDetailsModal.tsx
-import React, { useEffect, useState } from 'react';
-import styles from './CharacterDetailsModal.module.css';
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import React from 'react';
+import Image from 'next/image';
 
-// Interface para o objeto de personagem (baseado no que a API retorna)
 interface Character {
   id: string;
   name: string;
   status: string;
   species: string;
-  type: string;
+  type?: string;
   gender: string;
   image: string;
   origin: {
@@ -25,108 +23,110 @@ interface Character {
   }[];
 }
 
-// Interface para as props do componente Modal
 interface CharacterDetailsModalProps {
   character: Character | null;
-  onClose: () => void;
   isOpen: boolean;
+  onClose: () => void;
 }
 
-// Configuração do cliente Apollo (verifique a URL da API do Rick and Morty)
-const client = new ApolloClient({
-  uri: 'https://rickandmortyapi.com/graphql',
-  cache: new InMemoryCache(),
-});
+const CharacterDetailsModal: React.FC<CharacterDetailsModalProps> = ({ character, isOpen, onClose }) => {
+  if (!isOpen || !character) {
+    return null;
+  }
 
-const CharacterDetailsModal: React.FC<CharacterDetailsModalModalProps> = ({ character, onClose, isOpen }) => {
-  // Se o modal não estiver aberto ou não houver personagem, não renderize nada
-  if (!isOpen || !character) return null;
-
-  // Função para determinar a classe de estilo do status
-  const getStatusClass = (status: string) => {
-    switch (status) {
-      case 'Alive':
-        return styles.statusAlive;
-      case 'Dead':
-        return styles.statusDead;
-      case 'unknown':
-        return styles.statusUnknown;
-      default:
-        return '';
+  // Função auxiliar para formatar a string de tipo, se existir
+  const getCharacterType = () => {
+    if (character.type && character.type.trim() !== '') {
+      return ` - ${character.type}`;
     }
+    return '';
   };
 
   return (
-    <div className={styles.modalOverlay} onClick={onClose} data-is-open={isOpen}>
-      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-        {/* Botão Fechar no canto superior esquerdo da seção da imagem */}
-        <button onClick={onClose} className={styles.closeButton}>
+    <div
+      className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+      onClick={onClose} // Fecha o modal ao clicar fora
+    >
+      <div
+        className="bg-zinc-900 rounded-lg shadow-2xl p-6 relative
+                   max-w-4xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6
+                   border-2 border-yellow-500 overflow-hidden transform transition-all duration-300 ease-out scale-95 opacity-0
+                   data-[state=open]:scale-100 data-[state=open]:opacity-100" // Adicionado para animação de abertura
+        onClick={(e) => e.stopPropagation()} // Impede que o clique interno feche o modal
+        // Ajuste no className para usar 'data-[state=open]' para Tailwind 3.2+ para animação
+        // Se você não tem Tailwind 3.2+, pode usar um estado local para controlar a classe de animação
+      >
+        {/* Botão Fechar no canto superior direito (ícone X) */}
+        <button
+          className="absolute top-3 right-3 text-white text-2xl font-bold p-2
+                     hover:text-yellow-500 transition-colors z-20"
+          onClick={onClose}
+          aria-label="Fechar modal"
+        >
+          &times; {/* Caractere 'x' */}
+        </button>
+
+        {/* Botão Fechar no canto superior esquerdo (com o texto) */}
+        <button
+          className="absolute top-3 left-3 px-4 py-2 bg-zinc-700 text-white text-sm
+                     rounded-md hover:bg-zinc-600 transition-colors z-20"
+          onClick={onClose}
+        >
           Fechar
         </button>
 
-        <div className={styles.leftSection}>
-          <div className={styles.imageWrapper}>
-            <img
-              src={character.image}
-              alt={character.name}
-              className={styles.characterImage}
+
+        {/* Coluna da Esquerda: Imagem e Nome/Status Básico */}
+        <div className="flex flex-col items-center justify-start relative p-4 bg-zinc-800 rounded-lg border border-yellow-500">
+            <Image
+                src={character.image}
+                alt={character.name}
+                width={200} // Tamanho maior para a imagem no modal
+                height={200} // Tamanho maior para a imagem no modal
+                className="rounded-lg border-2 border-yellow-600 shadow-md mb-4 flex-shrink-0"
             />
-            {/* Banner amarelo com nome e tipo/espécie */}
-            <div className={styles.characterNameBanner}>
-              <h2 className={styles.characterName}>{character.name}</h2>
-              <p className={styles.characterTypeSpecies}>
-                {character.type ? character.type : character.species}
-              </p>
-            </div>
-          </div>
+            <h2 className="text-3xl font-bold text-yellow-400 mb-2 text-center">{character.name}</h2>
+            <p className="text-lg text-white mb-1">
+                <span className="font-semibold">Status:</span> {character.status}
+            </p>
+            <p className="text-lg text-white mb-1">
+                <span className="font-semibold">Espécie:</span> {character.species}
+            </p>
+            <p className="text-lg text-white mb-1">
+                <span className="font-semibold">Gênero:</span> {character.gender}
+            </p>
         </div>
 
-        <div className={styles.rightSection}>
-          {/* Informações Básicas */}
-          <div className={styles.infoGroup}>
-            <h3 className={styles.infoTitle}>SOBRE</h3>
-            <p>
-              <span className={getStatusClass(character.status)}>{character.status}</span>
-              {' '} - {character.species}
-              {character.type && ` - ${character.type}`}
-              {' '} - {character.gender === 'Male' ? 'Masculino' : character.gender === 'Female' ? 'Feminino' : 'Gênero Desconhecido'}.
+
+        {/* Coluna da Direita: Detalhes Separados */}
+        <div className="flex flex-col space-y-6">
+          {/* SOBRE */}
+          <div className="bg-zinc-800 p-4 rounded-lg border border-yellow-500">
+            <h3 className="text-xl font-bold text-yellow-400 mb-2 uppercase border-b border-yellow-700 pb-2">SOBRE</h3>
+            <p className="text-white text-lg">{character.name} is a {character.gender} {character.species}{getCharacterType()}. It is {character.status.toLowerCase()}.</p>
+          </div>
+
+          {/* ORIGEM */}
+          <div className="bg-zinc-800 p-4 rounded-lg border border-yellow-500">
+            <h3 className="text-xl font-bold text-yellow-400 mb-2 uppercase border-b border-yellow-700 pb-2">ORIGEM</h3>
+            <p className="text-white text-lg">
+              <span className="font-semibold">Planeta:</span> {character.origin?.name || 'unknown'}
+            </p>
+            <p className="text-white text-lg">
+              <span className="font-semibold">Dimensão:</span> {character.origin?.dimension || 'unknown'}
             </p>
           </div>
 
-          {/* Origem */}
-          <div className={styles.infoGroup}>
-            <h3 className={styles.infoTitle}>ORIGEM</h3>
-            <p>
-              Planeta: {character.origin?.name || 'Desconhecido'}
-              {character.origin?.dimension && character.origin.dimension !== 'unknown' && ` (${character.origin.dimension})`}
+          {/* LOCALIDADE ATUAL */}
+          <div className="bg-zinc-800 p-4 rounded-lg border border-yellow-500">
+            <h3 className="text-xl font-bold text-yellow-400 mb-2 uppercase border-b border-yellow-700 pb-2">LOCALIDADE ATUAL</h3>
+            <p className="text-white text-lg">
+              <span className="font-semibold">Planeta:</span> {character.location?.name || 'unknown'}
+            </p>
+            <p className="text-white text-lg">
+              <span className="font-semibold">Dimensão:</span> {character.location?.dimension || 'unknown'}
             </p>
           </div>
-
-          {/* Localização Atual */}
-          <div className={styles.infoGroup}>
-            <h3 className={styles.infoTitle}>LOCALIDADE ATUAL</h3>
-            <p>
-              Planeta: {character.location?.name || 'Desconhecido'}
-              {character.location?.dimension && character.location.dimension !== 'unknown' && ` (${character.location.dimension})`}
-            </p>
-          </div>
-
-          {/* Se você precisar de uma lista de episódios (como no modelo), pode ativar este bloco.
-              Por enquanto, vamos manter simples. Você precisaria buscar os episódios separadamente
-              ou ter essa informação já no objeto 'character' passado.
-          */}
-          {/* {character.episode && character.episode.length > 0 && (
-            <div className={styles.infoGroup}>
-              <h3 className={styles.infoTitle}>EPISÓDIOS</h3>
-              <div className={styles.episodeList}>
-                <ul className={styles.episodesScroll}>
-                  {character.episode.map((ep, index) => (
-                    <li key={index}>{ep.name}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )} */}
         </div>
       </div>
     </div>

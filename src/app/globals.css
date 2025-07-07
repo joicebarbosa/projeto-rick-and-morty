@@ -3,11 +3,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Você pode adicionar estilos globais aqui, se quiser */
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: sans-serif; /* Ou sua fonte preferida */
-  background-color: #1a202c; /* Fundo escuro padrão */
+  font-family: sans-serif;
+  background-color: #1a202c;
 }
+
+/* Animações customizadas */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 1s ease-out forwards;
+}
+
+/* ... seus outros estilos de modal se ainda estiverem lá */

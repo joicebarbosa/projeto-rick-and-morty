@@ -1,11 +1,10 @@
-// src/app/page.tsx
 'use client';
 
 import React, { useState } from 'react';
-import { ApolloProvider, ApolloClient, InMemoryCache, gql, useQuery } from '@apollo/client';
+import { ApolloProvider, ApolloClient, InMemoryCache, gql, useLazyQuery } from '@apollo/client'; // Importe useLazyQuery
 import CharacterDetailsModal from '@/components/CharacterDetailsModal';
-import CharacterCard from '@/components/CharacterCard'; // Importe o novo componente CharacterCard
-import Image from 'next/image'; // Para o logo
+import CharacterCard from '@/components/CharacterCard';
+import Image from 'next/image';
 
 // Cliente Apollo
 const client = new ApolloClient({
@@ -13,10 +12,16 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-// Query GraphQL (mantém a mesma)
+// Query GraphQL (iremos adicionar variáveis para busca e paginação)
 const GET_CHARACTERS = gql`
-  query GetCharacters {
-    characters {
+  query GetCharacters($page: Int, $name: String) {
+    characters(page: $page, filter: { name: $name }) {
+      info {
+        count
+        pages
+        next
+        prev
+      }
       results {
         id
         name
@@ -33,12 +38,15 @@ const GET_CHARACTERS = gql`
           name
           dimension
         }
+        episode {
+          name
+        }
       }
     }
   }
 `;
 
-// Interface para o objeto de personagem (mantenha consistente)
+// Interface para o objeto de personagem
 interface Character {
   id: string;
   name: string;
@@ -60,12 +68,14 @@ interface Character {
   }[];
 }
 
-// Componente principal da página
 const HomePageContent: React.FC = () => {
-  const { loading, error, data } = useQuery(GET_CHARACTERS);
+  // Alteramos de useQuery para useLazyQuery para disparar a busca apenas quando necessário
+  const [getCharacters, { loading, error, data }] = useLazyQuery(GET_CHARACTERS);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
-  const [searchTerm, setSearchTerm] = useState(''); // Estado para o campo de busca
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasSearched, setHasSearched] = useState(false); // Novo estado para controlar se a busca foi realizada
 
   const handleCardClick = (character: Character) => {
     setSelectedCharacter(character);
@@ -77,68 +87,111 @@ const HomePageContent: React.FC = () => {
     setSelectedCharacter(null);
   };
 
-  // Filtra os personagens com base no termo de busca
-  const filteredCharacters = data?.characters?.results.filter((character: Character) =>
-    character.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Função para lidar com a busca
+  const handleSearch = () => {
+    setCurrentPage(1); // Resetar para a primeira página em uma nova busca
+    setHasSearched(true); // Marcar que uma busca foi realizada
+    getCharacters({ variables: { page: 1, name: searchTerm } });
+  };
 
-  if (loading) return <p className="text-white text-center mt-8 text-xl">Carregando personagens...</p>;
-  if (error) return <p className="text-red-500 text-center mt-8 text-xl">Erro ao carregar personagens: {error.message}</p>;
+  // Função para mudar de página
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    getCharacters({ variables: { page: newPage, name: searchTerm } });
+    // Scrolla para o topo da página para ver os novos resultados
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const characters = data?.characters?.results || [];
+  const info = data?.characters?.info;
 
   return (
-    // O `min-h-screen` e `bg-cover` `bg-center` para a imagem de fundo
-    <main className="min-h-screen bg-gray-900 text-white p-8 relative overflow-hidden">
+    <main className="min-h-screen bg-gray-900 text-white p-8 relative overflow-hidden flex flex-col items-center justify-center">
       {/* Imagem de fundo */}
       <div
-        className="absolute inset-0 z-0 opacity-20"
+        className="absolute inset-0 z-0 opacity-100"
         style={{
-          backgroundImage: 'url(/assets/background.png)', // Certifique-se que o caminho está correto
+          backgroundImage: 'url(/assets/background.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       ></div>
 
-      <div className="relative z-10"> {/* Conteúdo principal acima da imagem de fundo */}
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen w-full">
         <header className="flex flex-col items-center justify-center mb-10">
-          {/* Adicione o logo, certifique-se que o caminho está correto em public/assets */}
           <Image
-            src="/assets/img-logo.png"
+            src="/assets/image-logo.png"
             alt="Rick and Morty Logo"
-            width={300} // Ajuste o tamanho conforme necessário
-            height={150} // Ajuste o tamanho conforme necessário
-            className="mb-6"
+            width={400} // Aumentado o tamanho para ficar mais proeminente
+            height={200}
+            className="mb-10 animate-fade-in" // Adicionada uma animação simples
           />
           <div className="flex space-x-4">
             <input
               type="text"
               placeholder="Pesquisar personagem..."
-              className="p-3 rounded-lg border-2 border-yellow-500 bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:border-yellow-300 w-full sm:w-64"
+              className="p-3 rounded-lg border-2 border-yellow-500 bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:border-yellow-300 w-full sm:w-80 transition-all duration-300 ease-in-out" // Largura ajustada
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearch();
+                }
+              }}
             />
             <button
-              className="px-6 py-3 bg-yellow-600 text-white font-bold rounded-lg hover:bg-yellow-500 transition-colors"
-              // A busca é em tempo real com onChange, então o botão pode ser opcional ou para uma ação diferente
-              onClick={() => { /* Ação de busca já ocorre no onChange */ }}
+              className="px-6 py-3 bg-yellow-600 text-white font-bold rounded-lg hover:bg-yellow-500 transition-colors duration-300 ease-in-out"
+              onClick={handleSearch}
             >
               Buscar
             </button>
           </div>
         </header>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 max-w-7xl mx-auto">
-          {filteredCharacters && filteredCharacters.length > 0 ? (
-            filteredCharacters.map((character: Character) => (
-              <CharacterCard
-                key={character.id}
-                character={character}
-                onClick={handleCardClick}
-              />
-            ))
-          ) : (
-            <p className="col-span-full text-center text-gray-400 text-lg">Nenhum personagem encontrado.</p>
-          )}
-        </div>
+        {/* Condicionalmente renderiza a lista de personagens APENAS se uma busca foi feita */}
+        {hasSearched && (
+          <div className="w-full max-w-7xl mx-auto">
+            {loading && <p className="text-white text-center mt-8 text-xl">Carregando personagens...</p>}
+            {error && <p className="text-red-500 text-center mt-8 text-xl">Erro ao carregar personagens: {error.message}</p>}
+
+            {!loading && !error && characters.length === 0 && (
+              <p className="col-span-full text-center text-gray-400 text-lg mt-8">Nenhum personagem encontrado com este nome.</p>
+            )}
+
+            {!loading && !error && characters.length > 0 && (
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 mt-8">
+                  {characters.map((character: Character) => (
+                    <CharacterCard
+                      key={character.id}
+                      character={character}
+                      onClick={handleCardClick}
+                    />
+                  ))}
+                </div>
+
+                {/* Paginação */}
+                <div className="flex justify-center items-center space-x-4 mt-12 mb-8">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={!info?.prev}
+                    className="px-6 py-3 bg-yellow-600 text-white font-bold rounded-lg hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Anterior
+                  </button>
+                  <span className="text-white text-lg">Página {currentPage} de {info?.pages || 1}</span>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={!info?.next}
+                    className="px-6 py-3 bg-yellow-600 text-white font-bold rounded-lg hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Próximo
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
 
         <CharacterDetailsModal
           character={selectedCharacter}
