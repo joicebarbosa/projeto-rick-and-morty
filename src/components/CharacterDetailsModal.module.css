@@ -1,0 +1,301 @@
+/* src/components/CharacterDetailsModal.module.css */
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); /* Fundo escuro e opaco */
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.modalOverlay[data-is-open="false"] {
+    opacity: 0;
+    pointer-events: none; /* Desativa cliques quando invisível */
+}
+
+.modalContent {
+    background-color: rgba(0, 0, 0, 0); /* Fundo transparente, as seções internas terão fundo */
+    color: white;
+    border-radius: 12px; /* Cantos mais arredondados */
+    box-shadow: 0 0 35px rgba(251, 255, 5, 0.9); /* Sombra amarela intensa para o "glow" */
+    border: 1px solid rgba(251, 255, 5, 0.9); /* Borda amarela forte */
+    z-index: 1001;
+    position: relative;
+    max-width: 780px; /* Largura um pouco maior para o novo layout */
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden; /* CRÍTICO para que as partes "fora" da imagem não gerem scrollbars */
+    display: flex;
+    flex-direction: column; /* Padrão mobile: empilhado */
+    box-sizing: border-box;
+    padding: 0; /* As seções internas terão padding */
+
+    /* Animação de entrada */
+    transform: scale(0.9);
+    opacity: 0;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.modalOverlay[data-is-open="true"] .modalContent {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.modalContent:hover {
+    box-shadow: 0 0 45px rgba(251, 255, 5, 1); /* Glow mais forte no hover */
+    border-color: rgba(251, 255, 5, 1);
+}
+
+.loadingErrorText {
+    text-align: center;
+    padding: 50px;
+    font-size: 1.2rem;
+    color: #eee;
+}
+
+/* Botão Fechar */
+.closeButton {
+    position: absolute; /* Posicionado absolutamente dentro do modalContent */
+    top: 20px; /* Ajustado para estar na altura correta no modelo */
+    left: 20px; /* Alinhado com a borda da imagem no modelo */
+    background-color: transparent;
+    color: rgba(251, 255, 5, 0.9); /* Texto amarelo */
+    border: 1px solid rgba(251, 255, 5, 0.7);
+    font-size: 0.9rem;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    opacity: 0.9;
+    transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    z-index: 10; /* Garante que o botão fique acima de tudo */
+}
+
+.closeButton:hover {
+    background-color: rgba(251, 255, 5, 0.2);
+    opacity: 1;
+    color: rgba(251, 255, 5, 1);
+    border-color: rgba(251, 255, 5, 1);
+}
+
+/* Estrutura de Layout do Modal */
+.leftSection {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Fundo cinza fosco/transparente */
+    background-color: rgba(100, 100, 100, 0.25);
+    padding-top: 20px; /* Padding acima da imagem */
+    padding-bottom: 20px; /* Padding abaixo do texto */
+    padding-left: 15px; /* Padding esquerdo */
+    padding-right: 15px; /* Padding direito */
+    box-sizing: border-box;
+    width: 100%; /* Ocupa largura total em mobile */
+    position: relative; /* Para a imagem "sair" */
+    overflow: visible; /* Permite que a imagem transborde */
+}
+
+.imageWrapper {
+    width: 180px; /* Largura da imagem no modal */
+    height: 270px; /* Altura da imagem (proporção 2:3) */
+    border-radius: 8px; /* Cantos arredondados na imagem */
+    overflow: hidden;
+    border: 2px solid rgba(251, 255, 5, 0.7); /* Borda amarela forte na imagem */
+    box-shadow: 0 0 15px rgba(251, 255, 5, 0.5); /* Sombra amarela para a imagem */
+    /* Margem negativa para puxar a imagem "para fora" */
+    margin-top: -60px; /* Puxa para cima, ajustado para o novo layout */
+    margin-bottom: 20px; /* Espaço abaixo da imagem para o banner */
+    z-index: 2; /* Garante que a imagem e seu banner fiquem acima das seções */
+    background-color: #333; /* Fallback */
+    position: relative; /* Para posicionar o banner */
+}
+
+.characterImage {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.characterNameBanner {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(251, 255, 5, 0.8); /* Fundo amarelo sólido para o banner */
+    color: black; /* Texto preto no banner */
+    padding: 8px 5px;
+    box-sizing: border-box;
+    text-align: center;
+    font-weight: bold;
+}
+
+.characterName {
+    font-size: 1.1rem; /* Nome menor no banner */
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.characterTypeSpecies {
+    font-size: 0.8rem; /* Tipo/Espécie menor */
+    margin: 0;
+    color: #333; /* Cor mais escura para contraste */
+}
+
+/* Cores de status (usadas na seção "SOBRE") */
+.statusAlive { color: #8bc34a; font-weight: bold; } /* Verde */
+.statusDead { color: #e57373; font-weight: bold; } /* Vermelho */
+.statusUnknown { color: #9e9e9e; font-weight: bold; } /* Cinza */
+
+
+.rightSection {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espaçamento ligeiramente menor entre os grupos de informações */
+    background-color: rgba(0, 0, 0, 0.7); /* Fundo preto mais transparente */
+    padding: 20px; /* Padding geral para o conteúdo */
+    box-sizing: border-box;
+    overflow-y: auto; /* Permite scroll se o conteúdo for longo */
+}
+
+.infoGroup {
+    /* Sem bordas ou fundos, como no modelo */
+}
+
+.infoTitle {
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: rgba(251, 255, 5, 0.9); /* Cor amarela para os títulos */
+    margin-top: 0;
+    margin-bottom: 8px; /* Margem menor abaixo do título */
+    border-bottom: 1px solid rgba(251, 255, 5, 0.4); /* Linha amarela sutil */
+    padding-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.infoGroup p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: rgb(75, 75, 75); /* COR DE TEXTO MAIS ESCURA, como no modelo */
+}
+
+.infoGroup p strong {
+    color: white; /* Mantém strong branco, se houver */
+    font-weight: 600;
+}
+
+/* Estilos para lista de episódios (se você descomentar no TSX) */
+.episodeList {
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.episodesScroll {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.episodesScroll li {
+    padding: 3px 0;
+    font-size: 0.9rem;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.episodesScroll li:last-child {
+    border-bottom: none;
+}
+
+
+/* ========================================= */
+/* MEDIA QUERIES ESPECÍFICAS DO MODAL */
+/* ========================================= */
+
+@media (min-width: 768px) { /* A partir de tablets, layout em duas colunas */
+    .modalContent {
+        flex-direction: row; /* Layout em linha (duas colunas) */
+        align-items: stretch; /* Garante que as colunas tenham a mesma altura */
+        max-width: 850px; /* Largura ajustada para o layout de duas colunas */
+        height: auto; /* Altura se ajusta ao conteúdo */
+        max-height: 80vh; /* Altura máxima em desktop */
+    }
+
+    .leftSection {
+        width: 250px; /* Largura fixa para a coluna da esquerda */
+        border-right: 1px solid rgba(251, 255, 5, 0.1); /* Linha divisória sutil */
+        border-bottom: none; /* Remove borda inferior */
+        border-top-right-radius: 0; /* Remove arredondamento superior direito */
+        border-bottom-left-radius: 12px; /* Arredondamento inferior esquerdo */
+        padding-top: 50px; /* Ajuste para o espaço superior da imagem */
+        padding-bottom: 20px;
+    }
+
+    .rightSection {
+        border-top-left-radius: 0; /* Remove arredondamento superior esquerdo */
+        border-bottom-right-radius: 12px; /* Arredondamento inferior direito */
+        padding-top: 25px; /* Ajusta padding para alinhar o conteúdo */
+        padding-bottom: 25px;
+    }
+
+    .imageWrapper {
+        width: 180px;
+        height: 270px;
+        margin-top: -80px; /* Puxa MAIS para fora em desktop */
+        margin-left: -20px; /* Puxa levemente para a esquerda em desktop */
+    }
+
+    .closeButton {
+        top: 20px; /* Posição do botão em relação ao modalContent */
+        left: 20px;
+    }
+}
+
+@media (max-width: 480px) { /* Telas de celular pequenas */
+    .modalContent {
+        width: 95%; /* Ocupa mais largura */
+        margin: 15px; /* Pequena margem */
+    }
+    .leftSection,
+    .rightSection {
+        padding: 15px; /* Padding menor */
+    }
+    .imageWrapper {
+        width: 120px;
+        height: 180px;
+        margin-top: -40px; /* Puxa menos para fora em telas pequenas */
+        margin-left: -10px; /* Puxa levemente para a esquerda em mobile */
+    }
+    .characterName {
+        font-size: 1rem;
+    }
+    .characterTypeSpecies {
+        font-size: 0.7rem;
+    }
+    .infoGroup p {
+        font-size: 0.85rem;
+    }
+    .infoTitle {
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+    .closeButton {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+        top: 15px;
+        left: 15px;
+    }
+}
