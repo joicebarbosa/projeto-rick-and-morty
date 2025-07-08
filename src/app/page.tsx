@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ApolloProvider, ApolloClient, InMemoryCache, gql, useLazyQuery } from '@apollo/client'; // Importe useLazyQuery
+import { ApolloProvider, ApolloClient, InMemoryCache, gql, useLazyQuery } from '@apollo/client';
 import CharacterDetailsModal from '@/components/CharacterDetailsModal';
 import CharacterCard from '@/components/CharacterCard';
 import Image from 'next/image';
+import AppBackground from '@/components/AppBackground'; // Importe o novo componente
 
 // Cliente Apollo
 const client = new ApolloClient({
@@ -12,7 +13,7 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-// Query GraphQL (iremos adicionar variáveis para busca e paginação)
+// Query GraphQL (mantém a mesma)
 const GET_CHARACTERS = gql`
   query GetCharacters($page: Int, $name: String) {
     characters(page: $page, filter: { name: $name }) {
@@ -69,13 +70,12 @@ interface Character {
 }
 
 const HomePageContent: React.FC = () => {
-  // Alteramos de useQuery para useLazyQuery para disparar a busca apenas quando necessário
   const [getCharacters, { loading, error, data }] = useLazyQuery(GET_CHARACTERS);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [hasSearched, setHasSearched] = useState(false); // Novo estado para controlar se a busca foi realizada
+  const [hasSearched, setHasSearched] = useState(false);
 
   const handleCardClick = (character: Character) => {
     setSelectedCharacter(character);
@@ -87,18 +87,15 @@ const HomePageContent: React.FC = () => {
     setSelectedCharacter(null);
   };
 
-  // Função para lidar com a busca
   const handleSearch = () => {
-    setCurrentPage(1); // Resetar para a primeira página em uma nova busca
-    setHasSearched(true); // Marcar que uma busca foi realizada
+    setCurrentPage(1);
+    setHasSearched(true);
     getCharacters({ variables: { page: 1, name: searchTerm } });
   };
 
-  // Função para mudar de página
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
     getCharacters({ variables: { page: newPage, name: searchTerm } });
-    // Scrolla para o topo da página para ver os novos resultados
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -106,31 +103,24 @@ const HomePageContent: React.FC = () => {
   const info = data?.characters?.info;
 
   return (
-    <main className="min-h-screen bg-gray-900 text-white p-8 relative overflow-hidden flex flex-col items-center justify-center">
-      {/* Imagem de fundo */}
-      <div
-        className="absolute inset-0 z-0 opacity-100"
-        style={{
-          backgroundImage: 'url(/assets/background.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      ></div>
+    <main className="min-h-screen text-white p-8 relative overflow-hidden flex flex-col items-center justify-center">
+      {/* Componente de Background */}
+      <AppBackground />
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen w-full">
         <header className="flex flex-col items-center justify-center mb-10">
           <Image
             src="/assets/image-logo.png"
             alt="Rick and Morty Logo"
-            width={400} // Aumentado o tamanho para ficar mais proeminente
+            width={400}
             height={200}
-            className="mb-10 animate-fade-in" // Adicionada uma animação simples
+            className="mb-10 animate-fade-in"
           />
           <div className="flex space-x-4">
             <input
               type="text"
               placeholder="Pesquisar personagem..."
-              className="p-3 rounded-lg border-2 border-yellow-500 bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:border-yellow-300 w-full sm:w-80 transition-all duration-300 ease-in-out" // Largura ajustada
+              className="p-3 rounded-lg border-2 border-yellow-500 bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:border-yellow-300 w-full sm:w-80 transition-all duration-300 ease-in-out"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={(e) => {
@@ -148,7 +138,6 @@ const HomePageContent: React.FC = () => {
           </div>
         </header>
 
-        {/* Condicionalmente renderiza a lista de personagens APENAS se uma busca foi feita */}
         {hasSearched && (
           <div className="w-full max-w-7xl mx-auto">
             {loading && <p className="text-white text-center mt-8 text-xl">Carregando personagens...</p>}
@@ -170,7 +159,6 @@ const HomePageContent: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Paginação */}
                 <div className="flex justify-center items-center space-x-4 mt-12 mb-8">
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
