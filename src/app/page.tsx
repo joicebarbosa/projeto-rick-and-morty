@@ -1,3 +1,4 @@
+// src/app/page.tsx - Código COMPLETO e CORRIGIDO
 'use client';
 
 import React, { useState } from 'react';
@@ -5,7 +6,6 @@ import { ApolloProvider, ApolloClient, InMemoryCache, gql, useLazyQuery } from '
 import CharacterDetailsModal from '@/components/CharacterDetailsModal';
 import CharacterCard from '@/components/CharacterCard';
 import Image from 'next/image';
-import AppBackground from '@/components/AppBackground'; // Importe o novo componente
 
 // Cliente Apollo
 const client = new ApolloClient({
@@ -13,7 +13,7 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-// Query GraphQL (mantém a mesma)
+// Query GraphQL com variáveis para busca e paginação
 const GET_CHARACTERS = gql`
   query GetCharacters($page: Int, $name: String) {
     characters(page: $page, filter: { name: $name }) {
@@ -103,14 +103,21 @@ const HomePageContent: React.FC = () => {
   const info = data?.characters?.info;
 
   return (
-    <main className="min-h-screen text-white p-8 relative overflow-hidden flex flex-col items-center justify-center">
-      {/* Componente de Background */}
-      <AppBackground />
+    // A tag <main> terá o conteúdo principal. O background de todo o body já está no globals.css.
+    <main className="min-h-screen text-white p-8 relative overflow-hidden flex flex-col items-center justify-start">
 
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen w-full">
+      {/* ESTE DIV QUE ERA O PROBLEMA FOI REMOVIDO DAQUI */}
+      {/* <div className="absolute inset-0 z-0 opacity-20" style={{
+        backgroundImage: 'url(/assets/background.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}></div> */}
+
+
+      <div className="relative z-10 flex flex-col items-center justify-start pt-20 w-full">
         <header className="flex flex-col items-center justify-center mb-10">
           <Image
-            src="/assets/image-logo.png"
+            src="/assets/img-logo.png"
             alt="Rick and Morty Logo"
             width={400}
             height={200}
@@ -120,7 +127,8 @@ const HomePageContent: React.FC = () => {
             <input
               type="text"
               placeholder="Pesquisar personagem..."
-              className="p-3 rounded-lg border-2 border-yellow-500 bg-zinc-700 text-white placeholder-gray-400 focus:outline-none focus:border-yellow-300 w-full sm:w-80 transition-all duration-300 ease-in-out"
+              // Classes para o efeito de "vidro" no input
+              className="p-3 rounded-lg border-2 border-yellow-500 bg-gray-900 bg-opacity-60 text-white placeholder-gray-300 focus:outline-none focus:border-yellow-300 focus:bg-opacity-80 backdrop-blur-md w-full sm:w-80 transition-all duration-300 ease-in-out"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={(e) => {
@@ -130,7 +138,8 @@ const HomePageContent: React.FC = () => {
               }}
             />
             <button
-              className="px-6 py-3 bg-yellow-600 text-white font-bold rounded-lg hover:bg-yellow-500 transition-colors duration-300 ease-in-out"
+              // Classes para o efeito de "vidro" no botão
+              className="px-6 py-3 bg-yellow-600 bg-opacity-70 text-white font-bold rounded-lg hover:bg-yellow-500 hover:bg-opacity-90 backdrop-blur-md transition-all duration-300 ease-in-out"
               onClick={handleSearch}
             >
               Buscar
