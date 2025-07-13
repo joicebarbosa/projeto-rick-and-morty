@@ -1,0 +1,263 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+}
+
+.background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  /* filter: brightness(0.7) contrast(1.1); */
+}
+
+.container { /* Usado para mensagens de carregamento/erro */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: white;
+    font-size: 1.2rem;
+    background-image: url('/assets/background.png');
+    background-size: cover;
+    background-position: center;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    text-align: center;
+}
+
+.error {
+    color: #ff6347;
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 15px 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(255, 99, 71, 0.5);
+    margin-bottom: 20px;
+}
+
+.content {
+  z-index: 1;
+  text-align: center;
+  color: white;
+  padding: 40px;
+  background-color: rgba(0, 0, 0, 0.8); /* Fundo mais escuro para destaque */
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+  margin-top: 50px;
+  width: 90%;
+  max-width: 900px; /* Largura máxima para a página de detalhes */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative; /* Para o botão de voltar */
+}
+
+.backButton {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 10px 15px;
+  background-color: rgba(0, 240, 192, 0.2);
+  color: #00f0c0;
+  border: 1px solid #00f0c0;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  z-index: 10; /* Garante que o botão fique acima de outros elementos */
+}
+
+.backButton:hover {
+  background-color: rgba(0, 240, 192, 0.4);
+  color: white;
+  border-color: white;
+}
+
+.characterName {
+  font-size: 3rem; /* Nome do personagem maior */
+  margin-bottom: 30px;
+  color: #00f0c0;
+  text-shadow: 0 0 10px rgba(0, 240, 192, 0.9);
+}
+
+.detailContainer {
+  display: flex;
+  flex-direction: row; /* Imagem ao lado das informações */
+  gap: 40px; /* Espaçamento entre imagem e bloco de info */
+  align-items: flex-start; /* Alinha o topo */
+  width: 100%;
+  padding: 20px;
+}
+
+.imageAndStatus {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0; /* Não permite que a imagem encolha */
+}
+
+.characterImage {
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 15px rgba(0, 240, 192, 0.5); /* Sombra neon */
+  border: 3px solid transparent; /* Borda para status */
+  transition: border-color 0.3s ease, filter 0.3s ease;
+}
+
+/* Efeitos visuais baseados no status da imagem */
+.characterImage.dead {
+  filter: grayscale(80%) sepia(50%) hue-rotate(330deg) saturate(200%) brightness(0.8);
+  border-color: #ff6347; /* Borda vermelha para mortos */
+}
+.characterImage.alive {
+  filter: brightness(1.1) saturate(1.1);
+  border-color: #32cd32; /* Borda verde para vivos */
+}
+.characterImage.unknown {
+  filter: grayscale(50%);
+  border-color: #cccccc; /* Borda cinza para desconhecidos */
+}
+
+.characterStatus {
+    font-size: 1.2rem;
+    margin-top: -10px; /* Ajusta para ficar mais próximo da imagem */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #ccc;
+}
+
+.statusDead {
+    color: #ff6347;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(255, 99, 71, 0.7);
+}
+
+.statusAlive {
+    color: #32cd32;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(50, 205, 50, 0.7);
+}
+.statusUnknown {
+    color: #cccccc;
+    font-weight: bold;
+}
+
+.infoBlock {
+  text-align: left; /* Alinha o texto à esquerda */
+  flex-grow: 1; /* Ocupa o espaço restante */
+}
+
+.infoBlock p {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.infoBlock strong {
+  color: #00f0c0; /* Cor neon para as labels */
+}
+
+.episodesTitle {
+  font-size: 1.8rem;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  color: #00f0c0;
+  text-shadow: 0 0 5px rgba(0, 240, 192, 0.7);
+  text-align: center;
+}
+
+.episodeList {
+  list-style: none; /* Remove bolinhas da lista */
+  padding: 0;
+  max-height: 250px; /* Limita a altura da lista de episódios */
+  overflow-y: auto; /* Adiciona scroll se a lista for grande */
+  border: 1px solid rgba(0, 240, 192, 0.3);
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.episodeItem {
+  padding: 8px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.95rem;
+  color: #ccc;
+  transition: background-color 0.2s ease;
+}
+
+.episodeItem:last-child {
+  border-bottom: none;
+}
+
+.episodeItem:hover {
+  background-color: rgba(0, 240, 192, 0.1);
+  color: white;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .content {
+    padding: 25px;
+    margin-top: 30px;
+    width: 95%;
+  }
+  .backButton {
+    position: static; /* Botão volta ao fluxo normal */
+    margin-bottom: 20px;
+    align-self: flex-start; /* Alinha à esquerda dentro do flex container */
+  }
+  .characterName {
+    font-size: 2.5rem;
+    margin-top: 15px; /* Espaçamento após o botão de voltar */
+  }
+  .detailContainer {
+    flex-direction: column; /* Pilha verticalmente */
+    align-items: center;
+    gap: 20px;
+  }
+  .characterImage {
+    width: 250px;
+    height: 250px;
+  }
+  .infoBlock {
+    text-align: center; /* Centraliza texto em mobile */
+  }
+  .infoBlock p {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+  .episodesTitle {
+    font-size: 1.5rem;
+    margin-top: 25px;
+    margin-bottom: 10px;
+  }
+  .episodeList {
+    max-height: 200px; /* Ajusta altura da lista de episódios */
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 15px;
+    margin-top: 20px;
+  }
+  .characterName {
+    font-size: 2rem;
+  }
+  .characterImage {
+    width: 200px;
+    height: 200px;
+  }
+  .infoBlock p {
+    font-size: 0.9rem;
+  }
+}
