@@ -60,7 +60,7 @@
   justify-content: center;
   align-items: center; /* Alinha verticalmente input e botão */
   width: 100%;
-  max-width: 380px; /* Largura máxima do conjunto input+botão */
+  max-width: 350px; /* Largura máxima do conjunto input+botão */
 }
 
 .searchInput {
