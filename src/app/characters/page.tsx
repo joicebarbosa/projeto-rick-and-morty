@@ -1,14 +1,15 @@
-'use client';
+// src/app/characters/page.tsx
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { request, gql } from 'graphql-request';
-import Image from 'next/image';
-import Link from 'next/link';
-import styles from './characters.module.css'; // Estilos para os cards e paginação
-import homeStyles from '../page.module.css'; // <--- IMPORTA OS ESTILOS DA PÁGINA INICIAL PARA LOGO/BUSCA
+import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { request, gql } from "graphql-request";
+import Image from "next/image";
+import Link from "next/link";
+import styles from "./characters.module.css"; // Estilos para os cards e paginação
+import homeStyles from "../page.module.css"; // IMPORTA OS ESTILOS DA PÁGINA INICIAL PARA LOGO/BUSCA
 
-const API_URL = 'https://rickandmortyapi.com/graphql';
+const API_URL = "https://rickandmortyapi.com/graphql";
 
 // Tipos (mantidos como estavam)
 interface Character {
@@ -16,7 +17,7 @@ interface Character {
   name: string;
   image: string;
   type: string;
-  status: 'Alive' | 'Dead' | 'unknown';
+  status: "Alive" | "Dead" | "unknown";
   species: string;
   gender: string;
 }
@@ -35,8 +36,8 @@ interface CharactersData {
 
 export default function CharactersPage() {
   const searchParams = useSearchParams();
-  const initialSearchTerm = searchParams.get('name') || ''; // Termo de busca da URL
-  const initialPage = Number(searchParams.get('page')) || 1; // Página da URL
+  const initialSearchTerm = searchParams.get("name") || ""; // Termo de busca da URL
+  const initialPage = Number(searchParams.get("page")) || 1; // Página da URL
 
   const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +68,7 @@ export default function CharactersPage() {
       router.push(`/characters?name=${trimmedTerm}&page=1`);
     } else {
       // Se a busca estiver vazia, navega para /characters (mostrando todos na primeira página)
-      router.push('/characters?page=1');
+      router.push("/characters?page=1");
     }
   };
 
@@ -97,7 +98,11 @@ export default function CharactersPage() {
       }
     `;
     try {
-      const data = await request<CharactersData>(API_URL, GET_CHARACTERS_QUERY, { name, page });
+      const data = await request<CharactersData>(
+        API_URL,
+        GET_CHARACTERS_QUERY,
+        { name, page }
+      );
       setCharacters(data.characters.results);
       setTotalPages(data.characters.info.pages);
       setCurrentPage(page); // Atualiza a página atual após a busca
@@ -107,7 +112,9 @@ export default function CharactersPage() {
         setError(`Não foi possível carregar os personagens: ${err.message}`);
       } else {
         console.error("Erro desconhecido ao buscar personagens:", err);
-        setError("Não foi possível carregar os detalhes do personagem. Erro desconhecido.");
+        setError(
+          "Não foi possível carregar os detalhes do personagem. Erro desconhecido."
+        );
       }
       setCharacters([]);
     } finally {
@@ -123,10 +130,10 @@ export default function CharactersPage() {
   // Lida com a mudança de página da paginação
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set('page', newPage.toString());
+    params.set("page", newPage.toString());
     // Garante que o termo de busca atual seja mantido na URL ao mudar de página
     if (initialSearchTerm) {
-      params.set('name', initialSearchTerm);
+      params.set("name", initialSearchTerm);
     }
     router.push(`/characters?${params.toString()}`);
   };
@@ -143,93 +150,116 @@ export default function CharactersPage() {
         />
       </div>
 
-      <div className={styles.content}>
-        {/* LOGO (reutilizando estilos da home) */}
-        <div className={homeStyles.logoContainer}>
-          <Link href="/"> {/* Torna o logo clicável para voltar à home */}
-            <Image
-              src="/assets/logo.png"
-              alt="Rick and Morty Logo"
-              width={450}
-              height={200}
-              style={{ cursor: 'pointer' }}
-            />
-          </Link>
-        </div>
+      {/* Removido o <div className={styles}> problemático aqui */}
+      {/* Agora, logo, busca, grid e paginação são irmãos diretos no 'main'
+          ou agrupados em um container SEM ESTILOS de background/padding. */}
 
-        {/* FORMULÁRIO DE BUSCA (reutilizando estilos da home) */}
-        <form onSubmit={handleSearchSubmit} className={homeStyles.searchForm}>
-          <input
-            type="text"
-            placeholder="Buscar personagem"
-            value={localSearchTerm}
-            onChange={handleSearchChange}
-            className={homeStyles.searchInput}
+      {/* LOGO (reutilizando estilos da home) */}
+      <div className={homeStyles.logoContainer}>
+        <Link href="/">
+          {/* Torna o logo clicável para voltar à home */}
+          <Image
+            src="/assets/logo.png" // Garanta que este é o logo correto
+            alt="Rick and Morty Logo"
+            width={450}
+            height={200}
+            style={{ cursor: "pointer" }}
           />
-          <button type="submit" className={homeStyles.searchButton}>Buscar</button>
-        </form>
-
-        {/* Renderização condicional para carregamento, erro ou resultados */}
-        {loading ? (
-          <p className={styles.loadingMessage}>Carregando personagens...</p>
-        ) : error ? (
-          <p className={styles.error}>{error}</p>
-        ) : characters.length === 0 ? (
-          <p className={styles.noResults}>Nenhum personagem encontrado com o nome "{initialSearchTerm}".</p>
-        ) : (
-          <>
-            {/* O título "Resultados para..." foi removido para se adequar à referência */}
-            <div className={styles.characterGrid}>
-              {characters.map((character) => (
-                <Link key={character.id} href={`/characters/${character.id}`} passHref>
-                  <div className={styles.characterCard}>
-                    <Image
-                      src={character.image}
-                      alt={character.name}
-                      width={200}
-                      height={200}
-                      className={`${styles.characterImage} ${
-                        character.status === 'Dead' ? styles.dead : ''
-                      } ${character.status === 'Alive' ? styles.alive : ''} ${
-                        character.status === 'unknown' ? styles.unknown : ''
-                      }`}
-                    />
-                    <h2 className={styles.characterName}>{character.name}</h2>
-                    <p className={styles.characterType}>Tipo: {character.type || 'Desconhecido'}</p>
-                    <p className={styles.characterStatus}>Status: <span className={`${
-                        character.status === 'Dead' ? styles.statusDead : ''
-                      } ${character.status === 'Alive' ? styles.statusAlive : ''} ${
-                        character.status === 'unknown' ? styles.statusUnknown : ''
-                      }`}>
-                        {character.status}
-                      </span>
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            {/* Paginação */}
-            <div className={styles.pagination}>
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className={styles.paginationButton}
-              >
-                Anterior
-              </button>
-              <span className={styles.pageInfo}>{`Página ${currentPage} de ${totalPages}`}</span>
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className={styles.paginationButton}
-              >
-                Próxima
-              </button>
-            </div>
-          </>
-        )}
+        </Link>
       </div>
+
+      {/* FORMULÁRIO DE BUSCA (reutilizando estilos da home) */}
+      <form onSubmit={handleSearchSubmit} className={homeStyles.searchForm}>
+        <input
+          type="text"
+          placeholder="Buscar personagem"
+          value={localSearchTerm}
+          onChange={handleSearchChange}
+          className={homeStyles.searchInput}
+        />
+        <button type="submit" className={homeStyles.searchButton}>
+          Buscar
+        </button>
+      </form>
+
+      {/* Renderização condicional para carregamento, erro ou resultados */}
+      {loading ? (
+        <p className={styles.loadingMessage}>Carregando personagens...</p>
+      ) : error ? (
+        <p className={styles.error}>{error}</p>
+      ) : characters.length === 0 ? (
+        <p className={styles.noResults}>
+          Nenhum personagem encontrado com o nome "{initialSearchTerm}".
+        </p>
+      ) : (
+        <>
+          {/* O título "Resultados para..." foi removido para se adequar à referência */}
+          <div className={styles.characterGrid}>
+            {characters.map((character) => (
+              <Link
+                key={character.id}
+                href={`/characters/${character.id}`}
+                passHref
+              >
+                <div className={styles.characterCard}>
+                  <Image
+                    src={character.image}
+                    alt={character.name}
+                    width={200} // Ajuste estes valores, eles podem ser sobrescritos pelo CSS
+                    height={200} // Mas é bom ter um valor base
+                    className={`${styles.characterImage} ${
+                      character.status === "Dead" ? styles.dead : ""
+                    } ${character.status === "Alive" ? styles.alive : ""} ${
+                      character.status === "unknown" ? styles.unknown : ""
+                    }`}
+                  />
+                  <h2 className={styles.characterName}>{character.name}</h2>
+                  <p className={styles.characterType}>
+                    Tipo: {character.type || "Desconhecido"}
+                  </p>
+                  <p className={styles.characterStatus}>
+                    Status:{" "}
+                    <span
+                      className={`${
+                        character.status === "Dead" ? styles.statusDead : ""
+                      } ${
+                        character.status === "Alive" ? styles.statusAlive : ""
+                      } ${
+                        character.status === "unknown"
+                          ? styles.statusUnknown
+                          : ""
+                      }`}
+                    >
+                      {character.status}
+                    </span>
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Paginação */}
+          <div className={styles.pagination}>
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={styles.paginationButton}
+            >
+              Anterior
+            </button>
+            <span
+              className={styles.pageInfo}
+            >{`Página ${currentPage} de ${totalPages}`}</span>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={styles.paginationButton}
+            >
+              Próxima
+            </button>
+          </div>
+        </>
+      )}
     </main>
   );
 }

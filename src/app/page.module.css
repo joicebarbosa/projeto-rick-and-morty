@@ -1,100 +1,96 @@
+/* src/app/page.module.css */
+
 .main {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Alinha o conteúdo ao topo */
-  align-items: center;
-  min-height: 100vh; /* Ocupa a altura total da viewport */
-  position: relative; /* Para o background */
-  overflow: hidden; /* Garante que o background não vaze */
-  padding: 20px; /* Padding geral */
-  padding-top: 10vh; /* Espaçamento do topo da tela, ajuste este valor para mover mais para cima/baixo */
+  align-items: center; /* Centraliza o conteúdo horizontalmente */
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  /* Removed padding-top here as the logoContainer has its own margin-top */
 }
 
 .background {
-  position: absolute;
+  position: fixed; /* Fixa o background para que ele não role com o conteúdo */
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -1; /* Coloca o background atrás do conteúdo */
-  /* filter: brightness(0.8) contrast(1.2); /* Opcional: Adicionar um filtro ao background */
+  z-index: -1;
+  filter: brightness(0.6) contrast(1.2); /* Mantenha o filtro para o efeito */
 }
 
-.content {
-  z-index: 1; /* Garante que o conteúdo fique na frente do background */
-  text-align: center;
-  background-color: transparent; /* Remove o fundo preto */
-  padding: 0; /* Remove o padding do container */
-  box-shadow: none; /* Remove a sombra */
-  border-radius: 0; /* Remove o border-radius */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 600px; /* Largura máxima para o bloco central de conteúdo */
-}
+/* O '.content' foi removido do .tsx, então não precisa existir aqui */
+/* .content {
+    ... REMOVER ESTE BLOCO SE ELE EXISTIR ...
+} */
 
 .logoContainer {
-  margin-bottom: 15px; /* Espaçamento entre a logo e o campo de busca */
-  /* --- ESTILOS DA ANIMAÇÃO DA LOGO --- */
-  animation: fadeIn 1s ease-out forwards; /* Aplica a animação: nome, duração, função de tempo, preenchimento */
-  opacity: 0; /* Começa invisível */
-  transform: translateY(-20px); /* Começa 20px acima da posição final para descer suavemente */
+  margin-top: 80px; /* Aumenta o espaçamento do topo para o logo */
+  margin-bottom: 40px; /* Aumenta o espaçamento abaixo do logo */
+  z-index: 1; /* Garante que o logo fique acima do background */
+  text-align: center; /* Garante que a imagem dentro do link seja centralizada */
 }
 
-/* --- DEFINIÇÃO DA ANIMAÇÃO KEYFRAMES --- */
-@keyframes fadeIn {
-  from {
-    opacity: 0; /* Estado inicial: totalmente transparente */
-    transform: translateY(-20px); /* Estado inicial: 20px acima da posição final */
-  }
-  to {
-    opacity: 1; /* Estado final: totalmente visível */
-    transform: translateY(0); /* Estado final: na posição original */
-  }
-}
-
-.searchContainer {
+.searchForm {
   display: flex;
-  gap: 10px; /* Espaçamento entre input e botão */
-  justify-content: center;
-  align-items: center; /* Alinha verticalmente input e botão */
-  width: 100%;
-  max-width: 350px; /* Largura máxima do conjunto input+botão */
+  gap: 20px; /* Aumenta o espaçamento entre input e botão */
+  margin-bottom: 80px; /* Aumenta o espaçamento abaixo do formulário de busca */
+  width: 90%; /* Permite que o formulário ocupe mais largura */
+  max-width: 600px; /* Mantém a largura máxima para não ficar muito grande em telas largas */
+  justify-content: center; /* Centraliza o input e botão */
+  z-index: 1; /* Garante que o formulário fique acima do background */
+  padding: 0 15px; /* Pequeno padding para não colar nas bordas em telas menores */
 }
 
 .searchInput {
-  flex-grow: 1; /* O input ocupa o espaço restante */
-  padding: 12px 18px; /* Padding interno */
-  border: 1px solid #525554; /* Borda cinza sutil */
-  border-radius: 8px; /* Bordas arredondadas */
-  font-size: 1rem;
-  background-color: rgba(0, 0, 0, 0.3); /* Fundo sutilmente escuro e transparente */
-  color: white; /* Cor do texto digitado */
-  outline: none; /* Remove a borda de foco padrão do navegador */
-  box-shadow: 0 0 8px rgba(71, 73, 73, 0.4); /* Sombra/brilho sutil */
+  flex-grow: 1;
+  padding: 18px 25px; /* Aumenta o padding do input */
+  border: 2px solid #00f0c0;
+  border-radius: 10px; /* Mais arredondado */
+  font-size: 1.2rem; /* Aumenta a fonte do input */
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.5); /* Torna o fundo do input um pouco mais opaco */
+  box-shadow: 0 0 15px rgba(0, 240, 192, 0.4); /* Adiciona um brilho mais forte */
 }
 
 .searchInput::placeholder {
-  color: #a0a0a0; /* Cor do placeholder */
-  opacity: 1; /* Garante que a cor do placeholder seja aplicada completamente */
+  color: #c0c0c0; /* Cor do placeholder mais visível */
 }
 
 .searchButton {
-  padding: 12px 25px; /* Padding interno */
-  background-color: transparent; /* Fundo transparente */
-  color: #525554; /* Cor do texto do botão */
-  border: 1px solid #525554; /* Borda do botão */
-  border-radius: 8px; /* Bordas arredondadas */
-  font-size: 1rem;
-  font-weight: bold; /* Texto em negrito */
-  cursor: pointer; /* Cursor de mão ao passar por cima */
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; /* Transição suave no hover */
-  min-width: 100px; /* Largura mínima para o botão */
+  padding: 18px 35px; /* Aumenta o padding do botão */
+  background-color: #00f0c0;
+  color: #000;
+  border: none;
+  border-radius: 10px; /* Mais arredondado */
+  font-size: 1.2rem; /* Aumenta a fonte do botão */
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 0 15px rgba(0, 240, 192, 0.6); /* Adiciona um brilho mais forte ao botão */
 }
 
 .searchButton:hover {
-  background-color: rgba(0, 240, 192, 0.1); /* Fundo sutilmente neon no hover */
-  color: white; /* Texto branco no hover */
-  border-color: white; /* Borda branca no hover */
+  background-color: #00cc99;
+  box-shadow: 0 0 20px rgba(0, 240, 192, 0.8);
+}
+
+/* Adicionando media query básica para o formulário em telas menores */
+@media (max-width: 768px) {
+    .logoContainer {
+        margin-top: 50px;
+        margin-bottom: 25px;
+    }
+    .searchForm {
+        flex-direction: column; /* Empilha input e botão */
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 40px;
+        width: 95%; /* Ocupa mais espaço em mobile */
+    }
+    .searchInput, .searchButton {
+        width: 100%; /* Fazem os elementos preencherem a largura */
+        font-size: 1rem;
+        padding: 15px 20px;
+    }
 }

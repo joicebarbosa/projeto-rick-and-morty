@@ -1,9 +1,11 @@
+// src/app/page.tsx
 'use client'; // Indica que é um Client Component
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'; // Para navegação
 import Image from 'next/image'; // Para otimização de imagens
 import styles from './page.module.css'; // Importa os estilos específicos da página inicial
+import Link from 'next/link'; // Importe Link para tornar o logo clicável
 
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState(''); // Estado para o termo de busca
@@ -36,30 +38,31 @@ export default function HomePage() {
         />
       </div>
 
-      {/* Conteúdo principal (logo e busca) */}
-      <div className={styles.content}>
-        {/* Contêiner para o logo */}
-        <div className={styles.logoContainer}>
+      {/* Conteúdo principal (logo e busca) - Removido o 'styles.content' */}
+      {/* Contêiner para o logo */}
+      <div className={styles.logoContainer}>
+        <Link href="/"> {/* Adicionado Link para o logo ser clicável */}
           <Image
-            src="/assets/logo.png" // Imagem do logo
+            src="/assets/logo.png" // Use o logo correto se tiver um Rick and Morty específico
             alt="Rick and Morty Logo"
             width={450} // Largura do logo
             height={200} // Altura do logo
+            style={{ cursor: 'pointer' }}
           />
-        </div>
-
-        {/* Formulário de busca */}
-        <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
-          <input
-            type="text"
-            placeholder="Buscar personagem"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className={styles.searchInput}
-          />
-          <button type="submit" className={styles.searchButton}>Buscar</button>
-        </form>
+        </Link>
       </div>
+
+      {/* Formulário de busca */}
+      <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
+        <input
+          type="text"
+          placeholder="Buscar personagem"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className={styles.searchInput}
+        />
+        <button type="submit" className={styles.searchButton}>Buscar</button>
+      </form>
     </main>
   );
 }
