@@ -7,19 +7,19 @@
   min-height: 100vh;
   position: relative;
   overflow: hidden;
-  padding-top: 80px; /* Aumenta o padding no topo para o logo/busca */
-  padding-bottom: 80px; /* Aumenta o padding para o conteúdo não colar no final */
+  padding-top: 80px; /* Espaçamento do topo para o logo/busca */
+  padding-bottom: 80px; /* Espaçamento no final da página */
   width: 100%;
+  box-sizing: border-box;
 }
 
 .background {
-  position: fixed; /* Fixa o background para que ele não role com o conteúdo */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: -1;
-  /* Mantenha o filtro aqui se quiser o background um pouco mais escuro/contrastado */
   filter: brightness(0.6) contrast(1.2);
 }
 
@@ -28,13 +28,13 @@
 .error,
 .noResults {
   color: white;
-  font-size: 1.6rem; /* Tamanho da fonte um pouco maior */
-  padding: 25px 50px; /* Padding maior */
-  background-color: rgba(0, 0, 0, 0.7); /* Fundo sutil */
-  border-radius: 12px; /* Mais arredondado */
+  font-size: 1.6rem;
+  padding: 25px 50px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 12px;
   margin-top: 60px;
   z-index: 1;
-  text-shadow: 0 0 8px rgba(0, 0, 0, 0.5); /* Sombra no texto */
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
 .error {
   color: #ff6347;
@@ -46,273 +46,223 @@
 
 .characterGrid {
   display: grid;
-  /* NOVO: Ajustado para 7 cards por linha em telas grandes (100% zoom)
-     minmax(largura mínima do card, 1fr) */
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 30px; /* Aumenta o espaçamento entre os cards */
+  gap: 30px;
   justify-content: center;
-  width: 90%; /* A grade ocupará 90% da largura do pai */
-  max-width: 1800px; /* Aumenta a largura máxima para acomodar 7+ cards */
-  margin-top: 60px; /* Espaçamento após o logo/busca */
+  width: 90%;
+  max-width: 1800px;
+  margin-top: 60px;
   margin-bottom: 60px;
   z-index: 1;
-  padding: 0 15px; /* Adiciona padding lateral para garantir que não cole nas bordas */
+  padding: 0 15px;
+  box-sizing: border-box;
 }
 
 .characterCard {
-  /* Fundo quase transparente para se misturar com o background */
-  background-color: rgba(255, 255, 255, 0.02); /* Muito sutil, quase invisível */
-  border: 1px solid rgba(0, 240, 192, 0.15); /* Borda bem sutil */
-  border-radius: 15px; /* Mais arredondado */
-  padding: 18px; /* Padding interno maior */
-  text-align: center;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6); /* Sombra mais forte */
+  background-color: rgba(60, 60, 60, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  
+  border-radius: 10px;
+  padding: 0;
+  text-align: left;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
   transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  overflow: hidden;
   width: 100%;
-  max-width: 250px; /* Limita a largura individual do card */
-  /* Ajuste para garantir que o card ocupe a altura disponível e se adapte */
-  height: 100%;
+  aspect-ratio: 1 / 1.2;
+
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  animation: fadeInScale 0.5s ease-out forwards;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .characterCard:hover {
-  transform: translateY(-10px); /* Elevação maior no hover */
-  box-shadow: 0 10px 30px rgba(0, 240, 192, 0.8); /* Brilho neon mais forte no hover */
-  background-color: rgba(0, 240, 192, 0.08); /* Uma leve cor neon no hover */
+  transform: translateY(-10px);
+  box-shadow: 0 0 30px rgba(0, 240, 192, 0.8),
+              0 0 60px rgba(0, 240, 192, 0.3);
+  background-color: rgba(60, 60, 60, 0.4);
 }
 
 .characterImage {
-  border-radius: 12px; /* Arredondamento da imagem */
-  margin-bottom: 18px; /* Espaçamento abaixo da imagem */
+  border-radius: 10px 10px 0 0;
   width: 100%;
-  height: 200px; /* Aumenta a altura da imagem */
+  height: auto;
+  max-height: 70%;
   object-fit: cover;
-  border: 3px solid transparent; /* Borda mais visível */
-  transition: border-color 0.3s ease, filter 0.3s ease;
+  margin-bottom: 10px;
 }
 
-/* Estilos de status para a imagem (mantidos) */
-.characterImage.dead {
-  filter: grayscale(80%) sepia(50%) hue-rotate(330deg) saturate(200%) brightness(0.8);
-  border-color: #ff6347;
-}
-.characterImage.alive {
-  filter: brightness(1.1) saturate(1.1);
-  border-color: #32cd32;
-}
+.characterImage.dead,
+.characterImage.alive,
 .characterImage.unknown {
-  filter: grayscale(50%);
-  border-color: #cccccc;
+  filter: none;
+  border-color: transparent;
 }
 
 .characterName {
-  font-size: 1.8rem; /* Tamanho da fonte do nome maior */
-  margin-bottom: 10px;
-  color: #00f0c0;
+  font-size: 1.2rem;
+  margin: 0 15px 5px 15px;
+  color: white;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-weight: bold; /* Nome em negrito */
+  font-weight: bold;
 }
 
-.characterType,
-.characterStatus {
-  font-size: 1.2rem; /* Tamanho da fonte do tipo e status maior */
-  margin-bottom: 8px;
-  color: #e0e0e0; /* Cor mais clara */
+.characterSpecies {
+  font-size: 0.9rem;
+  margin: 0 15px 15px 15px;
+  color: #ccc;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.characterType {
+  display: none;
+}
+
 .characterStatus {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px; /* Maior espaçamento */
+  display: none;
+}
+.statusDead, .statusAlive, .statusUnknown {
+  display: none;
 }
 
-/* Estilos de status para o texto (mantidos) */
-.statusDead {
-  color: #ff6347;
-  font-weight: bold;
-  text-shadow: 0 0 8px rgba(255, 99, 71, 0.9);
-}
-
-.statusAlive {
-  color: #32cd32;
-  font-weight: bold;
-  text-shadow: 0 0 8px rgba(50, 205, 50, 0.9);
-}
-.statusUnknown {
-  color: #cccccc;
-  font-weight: bold;
-  text-shadow: 0 0 8px rgba(204, 204, 204, 0.7);
-}
-
-/* Paginação - Ajustada para ser mais compacta e sem fundo visível */
+/* Nova Paginação Sutil e Elegante */
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px; /* Maior espaçamento entre os botões */
+  gap: 15px;
   margin-top: 60px;
   padding: 15px 0;
   z-index: 1;
 }
 
 .paginationButton {
-  padding: 12px 25px; /* Padding maior */
-  background-color: transparent; /* Fundo transparente */
+  padding: 10px 20px;
+  background-color: transparent;
   color: #00f0c0;
-  border: 2px solid #00f0c0; /* Borda mais visível */
-  border-radius: 8px; /* Mais arredondado */
+  border: 1px solid rgba(0, 240, 192, 0.5);
+  border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 1.1rem; /* Fonte maior */
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  font-size: 1rem; /* Mantém 1rem para ser consistente com o tamanho reduzido */
+  transition: all 0.3s ease;
+  box-shadow: 0 0 5px rgba(0, 240, 192, 0.3);
 }
 
 .paginationButton:disabled {
-  background-color: transparent;
   color: #888;
-  border-color: #888;
+  border-color: #555;
   cursor: not-allowed;
-  transform: none;
+  opacity: 0.6;
   box-shadow: none;
 }
 
 .paginationButton:hover:not(:disabled) {
-  background-color: rgba(0, 240, 192, 0.2); /* Pequeno fundo no hover */
+  background-color: rgba(0, 240, 192, 0.1);
   color: white;
-  border-color: white;
-  transform: translateY(-3px); /* Leve elevação no hover */
-  box-shadow: 0 0 15px rgba(0, 240, 192, 0.8); /* Brilho neon forte no hover */
+  border-color: #00f0c0;
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(0, 240, 192, 0.8),
+              0 0 30px rgba(0, 240, 192, 0.4);
 }
 
 .pageInfo {
-  font-size: 1.1rem; /* Fonte maior */
+  font-size: 1rem;
   color: #ccc;
-  min-width: 140px; /* Ajuste para centralizar o texto da página */
+  min-width: unset;
   text-align: center;
-  font-weight: bold;
-  text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  font-weight: normal;
+  text-shadow: none;
 }
 
-/*
-RESPONSIVIDADE: Ajustado para ir de ~7 cards (100% zoom) para ~10+ cards (50-67% zoom)
-*/
 
-/* @media para telas muito largas (monitores ultrawide, ex: > 2000px) */
+/* RESPONSIVIDADE - Ajustando minmax para se adequar ao novo tamanho do card e mais colunas */
+
+/* @media para telas muito largas (ex: monitores ultrawide ou zoom alto) */
 @media (min-width: 2000px) {
   .characterGrid {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 35px;
   }
-  .characterCard {
-    max-width: 260px;
-  }
-  .characterImage {
-    height: 220px;
-  }
 }
 
-/* Telas grandes / 100% zoom (1600px - 2000px), visa 7-8 cards por linha */
-@media (max-width: 1999px) { /* Começa a compactar quando a largura diminui */
+/* Telas grandes / 100% zoom (1600px - 1999px), visa 7-8 cards por linha */
+@media (max-width: 1999px) {
     .characterGrid {
         grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
         gap: 25px;
     }
-    .characterCard {
-        max-width: 230px;
-        padding: 16px;
-    }
-    .characterImage {
-        height: 180px;
-    }
-    .characterName {
-        font-size: 1.5rem;
-    }
-    .characterType, .characterStatus {
-        font-size: 1rem;
-    }
 }
-
 
 /* Telas médias / Simula 67% zoom (1200px - 1599px), visa 9-10 cards por linha */
 @media (max-width: 1599px) {
     .characterGrid {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); /* Mais compacto */
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
         gap: 20px;
-    }
-    .characterCard {
-        max-width: 180px;
-        padding: 14px;
-    }
-    .characterImage {
-        height: 140px;
-    }
-    .characterName {
-        font-size: 1.3rem;
-    }
-    .characterType, .characterStatus {
-        font-size: 0.9rem;
     }
 }
 
 /* Telas menores (tablets, notebooks menores) / Simula 50% zoom (800px - 1199px) */
 @media (max-width: 1199px) {
     .characterGrid {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Bem compacto */
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
         gap: 15px;
     }
     .characterCard {
-        max-width: 150px;
-        padding: 10px;
-    }
-    .characterImage {
-        height: 110px;
-        margin-bottom: 10px;
+        padding: 0;
     }
     .characterName {
-        font-size: 1.1rem;
-    }
-    .characterType, .characterStatus {
-        font-size: 0.8rem;
-    }
-    .pagination {
-        gap: 15px;
-    }
-    .paginationButton {
-        padding: 10px 20px;
         font-size: 1rem;
+        margin: 0 10px 5px 10px;
+    }
+    .characterSpecies {
+        font-size: 0.8rem;
+        margin: 0 10px 10px 10px;
+    }
+    /* Ajustes para a paginação em telas menores */
+    .paginationButton {
+        font-size: 0.9rem; /* Um pouco menor para mobile/tablets */
+        padding: 8px 15px;
     }
     .pageInfo {
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
 }
 
 /* Celulares (uma ou duas colunas maiores) */
 @media (max-width: 799px) {
     .characterGrid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Volta a ser maior para melhor visualização em mobile */
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
         gap: 20px;
     }
     .characterCard {
-        max-width: 180px;
-        padding: 12px;
-    }
-    .characterImage {
-        height: 140px;
+        padding: 0;
     }
     .characterName {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
-    .characterType, .characterStatus {
-        font-size: 0.9rem;
+    .characterSpecies {
+        font-size: 0.8rem;
     }
     .pagination {
         flex-direction: column;

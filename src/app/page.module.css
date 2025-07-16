@@ -3,94 +3,117 @@
 .main {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centraliza o conteúdo horizontalmente */
+  align-items: center; /* Centraliza horizontalmente */
+  justify-content: center; /* Centraliza verticalmente na tela */
   min-height: 100vh;
   position: relative;
   overflow: hidden;
-  /* Removed padding-top here as the logoContainer has its own margin-top */
+  padding: 20px; /* Padding geral para evitar que o conteúdo cole nas bordas */
+  box-sizing: border-box; /* Garante que o padding não aumente o tamanho total */
 }
 
 .background {
-  position: fixed; /* Fixa o background para que ele não role com o conteúdo */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: -1;
-  filter: brightness(0.6) contrast(1.2); /* Mantenha o filtro para o efeito */
+  filter: brightness(1.5) contrast(1.5);
 }
 
-/* O '.content' foi removido do .tsx, então não precisa existir aqui */
-/* .content {
-    ... REMOVER ESTE BLOCO SE ELE EXISTIR ...
-} */
-
 .logoContainer {
-  margin-top: 80px; /* Aumenta o espaçamento do topo para o logo */
-  margin-bottom: 40px; /* Aumenta o espaçamento abaixo do logo */
-  z-index: 1; /* Garante que o logo fique acima do background */
-  text-align: center; /* Garante que a imagem dentro do link seja centralizada */
+  margin-bottom: 50px; /* Espaçamento abaixo do logo */
+  z-index: 1;
+  text-align: center; /* Para centralizar a imagem se ela for menor que o container */
 }
 
 .searchForm {
   display: flex;
-  gap: 20px; /* Aumenta o espaçamento entre input e botão */
-  margin-bottom: 80px; /* Aumenta o espaçamento abaixo do formulário de busca */
-  width: 90%; /* Permite que o formulário ocupe mais largura */
-  max-width: 600px; /* Mantém a largura máxima para não ficar muito grande em telas largas */
-  justify-content: center; /* Centraliza o input e botão */
-  z-index: 1; /* Garante que o formulário fique acima do background */
-  padding: 0 15px; /* Pequeno padding para não colar nas bordas em telas menores */
+  gap: 15px; /* Reduz o espaçamento entre input e botão */
+  width: 80%; /* Ocupa um pouco menos da largura */
+  max-width: 500px; /* Reduz a largura máxima */
+  justify-content: center;
+  z-index: 1;
 }
 
 .searchInput {
   flex-grow: 1;
-  padding: 18px 25px; /* Aumenta o padding do input */
+  padding: 12px 20px; /* Reduz o padding */
   border: 2px solid #00f0c0;
-  border-radius: 10px; /* Mais arredondado */
-  font-size: 1.2rem; /* Aumenta a fonte do input */
+  border-radius: 8px; /* Levemente menos arredondado */
+  font-size: 1rem; /* Reduz o tamanho da fonte */
   color: #fff;
-  background-color: rgba(0, 0, 0, 0.5); /* Torna o fundo do input um pouco mais opaco */
-  box-shadow: 0 0 15px rgba(0, 240, 192, 0.4); /* Adiciona um brilho mais forte */
+  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 10px rgba(0, 240, 192, 0.4), /* Brilho inicial mais discreto */
+              inset 0 0 6px rgba(0, 240, 192, 0.2);
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.searchInput:focus {
+    border-color: #00cc99;
+    box-shadow: 0 0 20px rgba(0, 240, 192, 0.8),
+                inset 0 0 8px rgba(0, 240, 192, 0.4);
 }
 
 .searchInput::placeholder {
-  color: #c0c0c0; /* Cor do placeholder mais visível */
+  color: #c0c0c0;
 }
 
 .searchButton {
-  padding: 18px 35px; /* Aumenta o padding do botão */
+  padding: 12px 25px; /* Reduz o padding */
   background-color: #00f0c0;
   color: #000;
   border: none;
-  border-radius: 10px; /* Mais arredondado */
-  font-size: 1.2rem; /* Aumenta a fonte do botão */
+  border-radius: 8px; /* Levemente menos arredondado */
+  font-size: 1rem; /* Reduz o tamanho da fonte */
   cursor: pointer;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 0 15px rgba(0, 240, 192, 0.6); /* Adiciona um brilho mais forte ao botão */
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 240, 192, 0.6); /* Brilho inicial mais discreto */
+  outline: none;
 }
 
 .searchButton:hover {
   background-color: #00cc99;
-  box-shadow: 0 0 20px rgba(0, 240, 192, 0.8);
+  box-shadow: 0 0 20px rgba(0, 240, 192, 0.9),
+              0 0 40px rgba(0, 240, 192, 0.4);
+  transform: translateY(-2px);
 }
 
-/* Adicionando media query básica para o formulário em telas menores */
+/* Media Queries para responsividade da Home */
 @media (max-width: 768px) {
+    .main {
+        justify-content: flex-start;
+        padding-top: 50px;
+    }
     .logoContainer {
-        margin-top: 50px;
-        margin-bottom: 25px;
+        margin-bottom: 30px;
+    }
+    .logoContainer img {
+        width: 280px; /* Reduz ligeiramente o logo em mobile */
+        height: auto;
     }
     .searchForm {
-        flex-direction: column; /* Empilha input e botão */
+        flex-direction: column;
         align-items: center;
-        gap: 10px;
-        margin-bottom: 40px;
-        width: 95%; /* Ocupa mais espaço em mobile */
+        gap: 10px; /* Reduz o espaçamento em mobile */
+        width: 90%; /* Ocupa mais espaço em mobile */
+        max-width: 350px; /* Limita um pouco */
     }
     .searchInput, .searchButton {
-        width: 100%; /* Fazem os elementos preencherem a largura */
-        font-size: 1rem;
-        padding: 15px 20px;
+        width: 100%;
+        font-size: 0.9rem; /* Mais um pouco menor em mobile */
+        padding: 10px 15px; /* Reduz mais o padding em mobile */
+    }
+}
+
+@media (max-width: 480px) {
+    .logoContainer img {
+        width: 220px; /* Ainda menor em telas muito pequenas */
+    }
+    .searchInput, .searchButton {
+        font-size: 0.85rem;
+        padding: 8px 12px;
     }
 }

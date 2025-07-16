@@ -1,58 +1,57 @@
 // src/app/page.tsx
-'use client'; // Indica que é um Client Component
+'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // Para navegação
-import Image from 'next/image'; // Para otimização de imagens
-import styles from './page.module.css'; // Importa os estilos específicos da página inicial
-import Link from 'next/link'; // Importe Link para tornar o logo clicável
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link'; // Certifique-se de que Link está importado
+import styles from './page.module.css';
 
 export default function HomePage() {
-  const [searchTerm, setSearchTerm] = useState(''); // Estado para o termo de busca
-  const router = useRouter(); // Hook para roteamento
+  const [searchTerm, setSearchTerm] = useState('');
+  const router = useRouter();
 
-  // Lida com a mudança no input de busca
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
-  // Lida com o envio do formulário de busca
   const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Previne o recarregamento da página
-    if (searchTerm.trim()) { // Se o termo de busca não estiver vazio
-      // Navega para a página de personagens com o termo de busca na URL
-      router.push(`/characters?name=${searchTerm.trim()}`);
+    event.preventDefault();
+    const trimmedTerm = searchTerm.trim();
+    if (trimmedTerm) {
+      router.push(`/characters?name=${trimmedTerm}`);
+    } else {
+        // Se a busca estiver vazia na home, pode redirecionar para a página de caracteres sem filtro
+        router.push(`/characters`);
     }
   };
 
   return (
     <main className={styles.main}>
-      {/* Fundo da página */}
       <div className={styles.background}>
         <Image
-          src="/assets/background.png" // Imagem de fundo
+          src="/assets/background.png"
           alt="Rick and Morty Background"
-          layout="fill" // Preenche o contêiner pai
-          objectFit="cover" // Garante que a imagem cubra a área
-          quality={100} // Qualidade da imagem
+          layout="fill"
+          objectFit="cover"
+          quality={100}
         />
       </div>
 
-      {/* Conteúdo principal (logo e busca) - Removido o 'styles.content' */}
-      {/* Contêiner para o logo */}
+      {/* Logo Container */}
       <div className={styles.logoContainer}>
-        <Link href="/"> {/* Adicionado Link para o logo ser clicável */}
+        <Link href="/">
           <Image
-            src="/assets/logo.png" // Use o logo correto se tiver um Rick and Morty específico
+            src="/assets/logo.png" // Garanta que o caminho para o logo está correto
             alt="Rick and Morty Logo"
-            width={450} // Largura do logo
-            height={200} // Altura do logo
+            width={450}
+            height={200}
             style={{ cursor: 'pointer' }}
           />
         </Link>
       </div>
 
-      {/* Formulário de busca */}
+      {/* Search Form */}
       <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
         <input
           type="text"
