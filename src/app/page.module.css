@@ -3,13 +3,14 @@
 .main {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centraliza horizontalmente */
-  justify-content: center; /* Centraliza verticalmente na tela */
+  align-items: center;
+  justify-content: flex-start; /* Alinha os itens ao topo */
   min-height: 100vh;
   position: relative;
   overflow: hidden;
-  padding: 20px; /* Padding geral para evitar que o conteúdo cole nas bordas */
-  box-sizing: border-box; /* Garante que o padding não aumente o tamanho total */
+  padding: 15px;
+  padding-top: 50px; /* Adiciona padding no topo para o conteúdo não colar na borda */
+  box-sizing: border-box;
 }
 
 .background {
@@ -19,33 +20,32 @@
   width: 100%;
   height: 100%;
   z-index: -1;
-  filter: brightness(1.5) contrast(1.5);
 }
 
 .logoContainer {
-  margin-bottom: 50px; /* Espaçamento abaixo do logo */
+  margin-bottom: 25px; /* Espaçamento abaixo do logo */
   z-index: 1;
-  text-align: center; /* Para centralizar a imagem se ela for menor que o container */
+  text-align: center;
 }
 
 .searchForm {
   display: flex;
-  gap: 15px; /* Reduz o espaçamento entre input e botão */
-  width: 80%; /* Ocupa um pouco menos da largura */
-  max-width: 500px; /* Reduz a largura máxima */
+  gap: 10px;
+  width: 50%;
+  max-width: 400px; /* Aumentei um pouco o max-width para não ficar tão estreito */
   justify-content: center;
   z-index: 1;
 }
 
 .searchInput {
   flex-grow: 1;
-  padding: 12px 20px; /* Reduz o padding */
+  padding: 12px 20px;
   border: 2px solid #00f0c0;
-  border-radius: 8px; /* Levemente menos arredondado */
-  font-size: 1rem; /* Reduz o tamanho da fonte */
+  border-radius: 8px;
+  font-size: 1rem;
   color: #fff;
-  background-color: rgba(0, 0, 0, 0.5);
-  box-shadow: 0 0 10px rgba(0, 240, 192, 0.4), /* Brilho inicial mais discreto */
+  background-color: rgba(99, 98, 98, 0.5); /* Mantido o cinza mais claro */
+  box-shadow: 0 0 10px rgba(0, 240, 192, 0.4),
               inset 0 0 6px rgba(0, 240, 192, 0.2);
   outline: none;
   transition: all 0.3s ease;
@@ -62,15 +62,15 @@
 }
 
 .searchButton {
-  padding: 12px 25px; /* Reduz o padding */
+  padding: 12px 25px;
   background-color: #00f0c0;
   color: #000;
   border: none;
-  border-radius: 8px; /* Levemente menos arredondado */
-  font-size: 1rem; /* Reduz o tamanho da fonte */
+  border-radius: 8px;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 0 10px rgba(0, 240, 192, 0.6); /* Brilho inicial mais discreto */
+  box-shadow: 0 0 10px rgba(0, 240, 192, 0.6);
   outline: none;
 }
 
@@ -84,36 +84,38 @@
 /* Media Queries para responsividade da Home */
 @media (max-width: 768px) {
     .main {
-        justify-content: flex-start;
-        padding-top: 50px;
+        padding-top: 30px; /* Reduz padding top em mobile */
     }
     .logoContainer {
-        margin-bottom: 30px;
+        margin-bottom: 20px;
     }
     .logoContainer img {
-        width: 280px; /* Reduz ligeiramente o logo em mobile */
+        width: 250px; /* Reduz ligeiramente o logo em mobile */
         height: auto;
     }
     .searchForm {
         flex-direction: column;
         align-items: center;
-        gap: 10px; /* Reduz o espaçamento em mobile */
-        width: 90%; /* Ocupa mais espaço em mobile */
-        max-width: 350px; /* Limita um pouco */
+        gap: 8px; /* Reduz o espaçamento em mobile */
+        width: 90%;
+        max-width: 300px; /* Limita um pouco */
     }
     .searchInput, .searchButton {
         width: 100%;
-        font-size: 0.9rem; /* Mais um pouco menor em mobile */
-        padding: 10px 15px; /* Reduz mais o padding em mobile */
+        font-size: 0.9rem;
+        padding: 10px 15px;
     }
 }
 
 @media (max-width: 480px) {
     .logoContainer img {
-        width: 220px; /* Ainda menor em telas muito pequenas */
+        width: 180px; /* Ainda menor em telas muito pequenas */
     }
     .searchInput, .searchButton {
-        font-size: 0.85rem;
-        padding: 8px 12px;
+        font-size: 0.8rem;
+        padding: 7px 10px;
+    }
+    .main {
+        padding-top: 20px; /* Menos padding no topo */
     }
 }
