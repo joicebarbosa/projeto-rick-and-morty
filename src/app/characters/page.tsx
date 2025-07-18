@@ -1,147 +1,113 @@
 // src/app/characters/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { request, gql } from 'graphql-request';
-import Image from 'next/image';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { useSearchParams, useRouter } from 'next/navigation';
 import styles from './characters.module.css';
 import homeStyles from '../page.module.css';
-
-const API_URL = 'https://rickandmortyapi.com/graphql';
-
-interface LocationInfo { // Interface para dados de localização
-  id: string;
-  name: string;
-}
 
 interface Character {
   id: string;
   name: string;
-  image: string;
   status: 'Alive' | 'Dead' | 'unknown';
   species: string;
-  gender: string;
-  origin: LocationInfo; // Adicionado
-  location: LocationInfo; // Adicionado
-}
-
-interface CharactersData {
-  characters: {
-    results: Character[];
-    info: {
-      count: number;
-      pages: number;
-      next: number | null;
-      prev: number | null;
-    };
-  };
+  image: string;
 }
 
 export default function CharactersPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
+
   const initialSearchTerm = searchParams.get('name') || '';
   const initialPage = Number(searchParams.get('page')) || 1;
 
   const [characters, setCharacters] = useState<Character[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(1);
-  const [hasMore, setHasMore] = useState(false); // Novo estado para controlar o botão "Carregar Mais"
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const router = useRouter();
-  const [localSearchTerm, setLocalSearchTerm] = useState(initialSearchTerm);
-
-  useEffect(() => {
-    setLocalSearchTerm(initialSearchTerm);
-  }, [initialSearchTerm]);
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setLocalSearchTerm(event.target.value);
-  };
-
-  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const trimmedTerm = localSearchTerm.trim();
-    if (trimmedTerm) {
-      router.push(`/characters?name=${trimmedTerm}&page=1`);
-    } else {
-      router.push('/characters?page=1');
-    }
-  };
-
-  const fetchCharacters = async (name: string, page: number, append: boolean = false) => {
+  const fetchCharacters = useCallback(async (name: string, page: number) => {
     setLoading(true);
     setError(null);
-
-    const GET_CHARACTERS_QUERY = gql`
-      query GetCharacters($page: Int, $name: String) {
-        characters(page: $page, filter: { name: $name }) {
-          info {
-            count
-            pages
-            next
-            prev
-          }
-          results {
-            id
-            name
-            status
-            species
-            gender
-            image
-            origin { 
-              id
-              name
-            }
-            location { 
-              id
-              name
-            }
-          }
-        }
-      }
-    `;
-
     try {
-      const data = await request<CharactersData>(API_URL, GET_CHARACTERS_QUERY, {
-        name,
-        page,
-      });
+      const res = await fetch(`https://rickandmortyapi.com/api/character/?name=${name}&page=${page}`);
+      const data = await res.json();
 
-      if (append) { // Se for para adicionar aos resultados existentes
-        setCharacters((prevChars) => [...prevChars, ...data.characters.results]);
-      } else { // Se for uma nova busca ou primeira carga
-        setCharacters(data.characters.results);
+      if (res.ok && !data.error) {
+        setCharacters(data.results || []);
+        setTotalPages(data.info.pages || 1);
+      } else {
+        setCharacters([]);
+        setTotalPages(1);
+        setError(data.error || `Nenhum personagem encontrado com o nome "${name}".`);
       }
-      
-      setTotalPages(data.characters.info.pages);
-      setCurrentPage(page);
-      setHasMore(data.characters.info.next !== null); // Habilita o "Carregar Mais" se houver próxima página
-
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error('Erro ao buscar personagens:', err.message);
-        setError(`Não foi possível carregar os personagens: ${err.message}`);
+        setError(`Erro ao carregar os personagens: ${err.message}`);
       } else {
         console.error('Erro desconhecido ao buscar personagens:', err);
         setError('Erro desconhecido ao carregar os personagens.');
       }
       setCharacters([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    const currentName = searchParams.get('name') || '';
+    const currentPageFromUrl = Number(searchParams.get('page')) || 1;
+    setSearchTerm(currentName);
+    setCurrentPage(currentPageFromUrl);
+    fetchCharacters(currentName, currentPageFromUrl);
+  }, [searchParams, fetchCharacters]);
+
+  const updateUrlAndFetch = (name: string, page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (name) {
+      params.set('name', name);
+    } else {
+      params.delete('name');
+    }
+    params.set('page', String(page));
+    router.push(`?${params.toString()}`);
   };
 
-  // Carrega personagens na montagem do componente ou mudança de searchParams
-  useEffect(() => {
-    fetchCharacters(initialSearchTerm, initialPage);
-  }, [initialSearchTerm, initialPage]);
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateUrlAndFetch(searchTerm, 1);
+  };
 
-  const handleLoadMore = () => { // Nova função para carregar mais
-    fetchCharacters(localSearchTerm, currentPage + 1, true); // Chama com append: true
+  const handlePageChange = (pageNumber: number) => {
+    updateUrlAndFetch(searchTerm, pageNumber);
+  };
+
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxPagesToShow = 7;
+    const half = Math.floor(maxPagesToShow / 2);
+
+    let startPage = Math.max(1, currentPage - half);
+    let endPage = Math.min(totalPages, currentPage + half);
+
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      if (startPage === 1) {
+        endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+      } else if (endPage === totalPages) {
+        startPage = Math.max(1, totalPages - maxPagesToShow + 1);
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+    return pageNumbers;
   };
 
   return (
@@ -171,65 +137,98 @@ export default function CharactersPage() {
       <form onSubmit={handleSearchSubmit} className={homeStyles.searchForm}>
         <input
           type="text"
+          name="search"
           placeholder="Buscar personagem"
-          value={localSearchTerm}
-          onChange={handleSearchChange}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           className={homeStyles.searchInput}
         />
-        <button type="submit" className={homeStyles.searchButton}>
-          Buscar
-        </button>
+        <button type="submit" className={homeStyles.searchButton}>Buscar</button>
       </form>
 
-      {loading && characters.length === 0 ? ( // Mostra mensagem de carregamento inicial
+      {loading && characters.length === 0 ? (
         <p className={styles.loadingMessage}>Carregando personagens...</p>
       ) : error ? (
         <p className={styles.error}>{error}</p>
       ) : characters.length === 0 ? (
         <p className={styles.noResults}>
-          Nenhum personagem encontrado com o nome "{initialSearchTerm}".
+          Nenhum personagem encontrado com o nome "{searchTerm}".
         </p>
       ) : (
-        <>
+        <div className={styles.gridContainer}>
           <div className={styles.characterGrid}>
             {characters.map((character) => (
-              <Link
-                key={character.id}
-                href={`/characters/${character.id}`}
-                className={styles.characterCard}
-              >
-                <Image
-                  src={character.image}
-                  alt={character.name}
-                  width={200}
-                  height={200}
-                  className={styles.characterImage}
-                />
-                <div className={styles.cardContent}> {/* NOVO: Container para o conteúdo do card */}
-                    <h2 className={styles.characterName}>{character.name}</h2>
-                    <p className={styles.characterSpecies}>Espécie: {character.species}</p>
-                    {/* NOVO: Informações de Origem e Localização no hover */}
-                    <div className={styles.hoverInfo}>
-                        <p><strong>Origem:</strong> {character.origin?.name || 'Desconhecida'}</p>
-                        <p><strong>Localização:</strong> {character.location?.name || 'Desconhecida'}</p>
-                    </div>
+              <Link key={character.id} href={`/characters/${character.id}`} className={styles.characterCard}>
+                <div className={styles.imageWrapper}>
+                  <Image
+                    src={character.image}
+                    alt={character.name}
+                    width={200}
+                    height={200}
+                    className={styles.characterImage}
+                  />
+                  {/* Ajustado para mostrar APENAS o status, sem "Status: " */}
+                  <div className={styles.hoverOverlay}>
+                    <p className={`${styles.statusBadge} ${
+                      character.status === 'Dead'
+                        ? styles.dead
+                        : character.status === 'Alive'
+                        ? styles.alive
+                        : styles.unknown
+                    }`}>
+                      {character.status}
+                    </p>
+                  </div>
+                </div>
+                <div className={styles.info}>
+                  <h3>{character.name}</h3>
+                  <p>Espécie: {character.species}</p>
                 </div>
               </Link>
             ))}
           </div>
 
-          {hasMore && ( // Renderiza o botão "Carregar Mais" apenas se houver mais páginas
-            <div className={styles.loadMoreContainer}>
+          <div className={styles.pagination}>
+            <button
+              onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1 || loading}
+            >
+              «
+            </button>
+            {totalPages > 0 && (
+                currentPage - Math.floor(getPageNumbers().length / 2) > 1 && (
+                    <>
+                        <button onClick={() => handlePageChange(1)}>1</button>
+                        {currentPage - Math.floor(getPageNumbers().length / 2) > 2 && <span className={styles.paginationEllipsis}>...</span>}
+                    </>
+                )
+            )}
+            {getPageNumbers().map((pageNumber) => (
               <button
-                onClick={handleLoadMore}
-                disabled={loading} // Desabilita enquanto carrega
-                className={styles.loadMoreButton}
+                key={pageNumber}
+                onClick={() => handlePageChange(pageNumber)}
+                className={pageNumber === currentPage ? styles.activePage : ''}
+                disabled={loading}
               >
-                {loading ? 'Carregando...' : 'Carregar Mais'}
+                {pageNumber}
               </button>
-            </div>
-          )}
-        </>
+            ))}
+            {totalPages > 0 && (
+                currentPage + Math.floor(getPageNumbers().length / 2) < totalPages && (
+                    <>
+                        {currentPage + Math.floor(getPageNumbers().length / 2) < totalPages - 1 && <span className={styles.paginationEllipsis}>...</span>}
+                        <button onClick={() => handlePageChange(totalPages)}>{totalPages}</button>
+                    </>
+                )
+            )}
+            <button
+              onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages || loading}
+            >
+              »
+            </button>
+          </div>
+        </div>
       )}
     </main>
   );

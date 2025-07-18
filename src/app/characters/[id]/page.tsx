@@ -1,4 +1,3 @@
-// src/app/characters/[id]/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -105,7 +104,7 @@ export default function CharacterDetailPage() {
   if (loading) {
     return (
       <div className={styles.container}>
-        <p className={styles.loadingMessage}>Carregando detalhes do personagem...</p>
+        <p>Carregando detalhes do personagem...</p>
       </div>
     );
   }
@@ -124,7 +123,7 @@ export default function CharacterDetailPage() {
   if (!character) {
     return (
       <div className={styles.container}>
-        <p className={styles.noResults}>Dados do personagem não disponíveis.</p>
+        <p>Dados do personagem não disponíveis.</p>
         <button onClick={() => router.back()} className={styles.backButton}>
           Voltar para a busca
         </button>
@@ -172,27 +171,12 @@ export default function CharacterDetailPage() {
 
         <h1 className={styles.characterName}>{character.name}</h1>
 
-        <div className={styles.infoBlocksContainer}> {/* Novo container para os blocos de info */}
-            <div className={styles.infoBlock}>
-                <h2>Sobre</h2>
-                <p><strong>Espécie:</strong> {character.species}</p>
-                <p><strong>Gênero:</strong> {character.gender}</p>
-                {character.type && <p><strong>Tipo:</strong> {character.type}</p>}
-            </div>
-
-            <div className={styles.infoBlock}>
-                <h2>Origem</h2>
-                <p>{character.origin.name || 'Desconhecida'}</p>
-                {character.origin.type && <p><strong>Tipo:</strong> {character.origin.type}</p>}
-                {character.origin.dimension && <p><strong>Dimensão:</strong> {character.origin.dimension}</p>}
-            </div>
-
-            <div className={styles.infoBlock}>
-                <h2>Localização Atual</h2>
-                <p>{character.location.name || 'Desconhecida'}</p>
-                {character.location.type && <p><strong>Tipo:</strong> {character.location.type}</p>}
-                {character.location.dimension && <p><strong>Dimensão:</strong> {character.location.dimension}</p>}
-            </div>
+        <div className={styles.infoBlock}>
+          <p><strong>Espécie:</strong> {character.species}</p>
+          <p><strong>Gênero:</strong> {character.gender}</p>
+          {character.type && <p><strong>Tipo:</strong> {character.type}</p>}
+          <p><strong>Origem:</strong> {character.origin.name}</p>
+          <p><strong>Localização Atual:</strong> {character.location.name}</p>
         </div>
       </div>
     </main>
