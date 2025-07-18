@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import Link from 'next/link'; // Certifique-se de que Link está importado
+import Link from 'next/link';
 import styles from './page.module.css';
 
 export default function HomePage() {
@@ -42,7 +42,7 @@ export default function HomePage() {
       <div className={styles.logoContainer}>
         <Link href="/">
           <Image
-            src="/assets/logo.png" // Garanta que o caminho para o logo está correto
+            src="/assets/logo.png"
             alt="Rick and Morty Logo"
             width={450}
             height={200}

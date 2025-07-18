@@ -1,24 +1,30 @@
 // src/app/characters/page.tsx
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { request, gql } from "graphql-request";
-import Image from "next/image";
-import Link from "next/link";
-import styles from "./characters.module.css";
-import homeStyles from "../page.module.css";
+import { useEffect, useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { request, gql } from 'graphql-request';
+import Image from 'next/image';
+import Link from 'next/link';
+import styles from './characters.module.css';
+import homeStyles from '../page.module.css';
 
-const API_URL = "https://rickandmortyapi.com/graphql";
+const API_URL = 'https://rickandmortyapi.com/graphql';
+
+interface LocationInfo { // Interface para dados de localização
+  id: string;
+  name: string;
+}
 
 interface Character {
   id: string;
   name: string;
   image: string;
-  type: string;
-  status: "Alive" | "Dead" | "unknown";
+  status: 'Alive' | 'Dead' | 'unknown';
   species: string;
   gender: string;
+  origin: LocationInfo; // Adicionado
+  location: LocationInfo; // Adicionado
 }
 
 interface CharactersData {
@@ -35,14 +41,15 @@ interface CharactersData {
 
 export default function CharactersPage() {
   const searchParams = useSearchParams();
-  const initialSearchTerm = searchParams.get("name") || "";
-  const initialPage = Number(searchParams.get("page")) || 1;
+  const initialSearchTerm = searchParams.get('name') || '';
+  const initialPage = Number(searchParams.get('page')) || 1;
 
   const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(1);
+  const [hasMore, setHasMore] = useState(false); // Novo estado para controlar o botão "Carregar Mais"
 
   const router = useRouter();
   const [localSearchTerm, setLocalSearchTerm] = useState(initialSearchTerm);
@@ -61,13 +68,14 @@ export default function CharactersPage() {
     if (trimmedTerm) {
       router.push(`/characters?name=${trimmedTerm}&page=1`);
     } else {
-      router.push("/characters?page=1");
+      router.push('/characters?page=1');
     }
   };
 
-  const fetchCharacters = async (name: string, page: number) => {
+  const fetchCharacters = async (name: string, page: number, append: boolean = false) => {
     setLoading(true);
     setError(null);
+
     const GET_CHARACTERS_QUERY = gql`
       query GetCharacters($page: Int, $name: String) {
         characters(page: $page, filter: { name: $name }) {
@@ -82,31 +90,44 @@ export default function CharactersPage() {
             name
             status
             species
-            type
             gender
             image
+            origin { 
+              id
+              name
+            }
+            location { 
+              id
+              name
+            }
           }
         }
       }
     `;
+
     try {
-      const data = await request<CharactersData>(
-        API_URL,
-        GET_CHARACTERS_QUERY,
-        { name, page }
-      );
-      setCharacters(data.characters.results);
+      const data = await request<CharactersData>(API_URL, GET_CHARACTERS_QUERY, {
+        name,
+        page,
+      });
+
+      if (append) { // Se for para adicionar aos resultados existentes
+        setCharacters((prevChars) => [...prevChars, ...data.characters.results]);
+      } else { // Se for uma nova busca ou primeira carga
+        setCharacters(data.characters.results);
+      }
+      
       setTotalPages(data.characters.info.pages);
       setCurrentPage(page);
+      setHasMore(data.characters.info.next !== null); // Habilita o "Carregar Mais" se houver próxima página
+
     } catch (err: unknown) {
       if (err instanceof Error) {
-        console.error("Erro ao buscar personagens:", err.message);
+        console.error('Erro ao buscar personagens:', err.message);
         setError(`Não foi possível carregar os personagens: ${err.message}`);
       } else {
-        console.error("Erro desconhecido ao buscar personagens:", err);
-        setError(
-          "Não foi possível carregar os detalhes do personagem. Erro desconhecido."
-        );
+        console.error('Erro desconhecido ao buscar personagens:', err);
+        setError('Erro desconhecido ao carregar os personagens.');
       }
       setCharacters([]);
     } finally {
@@ -114,17 +135,13 @@ export default function CharactersPage() {
     }
   };
 
+  // Carrega personagens na montagem do componente ou mudança de searchParams
   useEffect(() => {
     fetchCharacters(initialSearchTerm, initialPage);
   }, [initialSearchTerm, initialPage]);
 
-  const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("page", newPage.toString());
-    if (initialSearchTerm) {
-      params.set("name", initialSearchTerm);
-    }
-    router.push(`/characters?${params.toString()}`);
+  const handleLoadMore = () => { // Nova função para carregar mais
+    fetchCharacters(localSearchTerm, currentPage + 1, true); // Chama com append: true
   };
 
   return (
@@ -142,11 +159,11 @@ export default function CharactersPage() {
       <div className={homeStyles.logoContainer}>
         <Link href="/">
           <Image
-            src="/assets/logo.png" 
+            src="/assets/logo.png"
             alt="Rick and Morty Logo"
             width={450}
             height={200}
-            style={{ cursor: "pointer" }}
+            style={{ cursor: 'pointer' }}
           />
         </Link>
       </div>
@@ -164,7 +181,7 @@ export default function CharactersPage() {
         </button>
       </form>
 
-      {loading ? (
+      {loading && characters.length === 0 ? ( // Mostra mensagem de carregamento inicial
         <p className={styles.loadingMessage}>Carregando personagens...</p>
       ) : error ? (
         <p className={styles.error}>{error}</p>
@@ -179,42 +196,39 @@ export default function CharactersPage() {
               <Link
                 key={character.id}
                 href={`/characters/${character.id}`}
-                passHref
+                className={styles.characterCard}
               >
-                <div className={styles.characterCard}>
-                  <Image
-                    src={character.image}
-                    alt={character.name}
-                    width={200}
-                    height={200}
-                    className={styles.characterImage}
-                  />
-                  <h2 className={styles.characterName}>{character.name}</h2>
-                  <p className={styles.characterSpecies}>Espécie: {character.species}</p>
+                <Image
+                  src={character.image}
+                  alt={character.name}
+                  width={200}
+                  height={200}
+                  className={styles.characterImage}
+                />
+                <div className={styles.cardContent}> {/* NOVO: Container para o conteúdo do card */}
+                    <h2 className={styles.characterName}>{character.name}</h2>
+                    <p className={styles.characterSpecies}>Espécie: {character.species}</p>
+                    {/* NOVO: Informações de Origem e Localização no hover */}
+                    <div className={styles.hoverInfo}>
+                        <p><strong>Origem:</strong> {character.origin?.name || 'Desconhecida'}</p>
+                        <p><strong>Localização:</strong> {character.location?.name || 'Desconhecida'}</p>
+                    </div>
                 </div>
               </Link>
             ))}
           </div>
 
-          <div className={styles.pagination}>
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className={styles.paginationButton}
-            >
-              Anterior
-            </button>
-            <span
-              className={styles.pageInfo}
-            >{`Página ${currentPage} de ${totalPages}`}</span>
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className={styles.paginationButton}
-            >
-              Próxima
-            </button>
-          </div>
+          {hasMore && ( // Renderiza o botão "Carregar Mais" apenas se houver mais páginas
+            <div className={styles.loadMoreContainer}>
+              <button
+                onClick={handleLoadMore}
+                disabled={loading} // Desabilita enquanto carrega
+                className={styles.loadMoreButton}
+              >
+                {loading ? 'Carregando...' : 'Carregar Mais'}
+              </button>
+            </div>
+          )}
         </>
       )}
     </main>
