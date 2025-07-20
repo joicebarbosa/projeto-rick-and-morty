@@ -1,4 +1,3 @@
-// src/app/characters/page.tsx
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -7,6 +6,8 @@ import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
 import styles from './characters.module.css';
 import homeStyles from '../page.module.css';
+import { motion } from 'framer-motion';
+import BackToTopButton from '@/components/BackToTopButton';
 
 interface Character {
   id: string;
@@ -29,6 +30,9 @@ export default function CharactersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   const fetchCharacters = useCallback(async (name: string, page: number) => {
     setLoading(true);
@@ -110,6 +114,23 @@ export default function CharactersPage() {
     return pageNumbers;
   };
 
+  const handleMouseEnter = (characterId: string) => {
+    setHoveredCardId(characterId);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredCardId(null);
+    setMousePosition({ x: 0, y: 0 });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const cardRect = e.currentTarget.getBoundingClientRect();
+    setMousePosition({
+      x: e.clientX - cardRect.left,
+      y: e.clientY - cardRect.top,
+    });
+  };
+
   return (
     <main className={styles.main}>
       <div className={styles.background}>
@@ -157,34 +178,54 @@ export default function CharactersPage() {
       ) : (
         <div className={styles.gridContainer}>
           <div className={styles.characterGrid}>
-            {characters.map((character) => (
-              <Link key={character.id} href={`/characters/${character.id}`} className={styles.characterCard}>
-                <div className={styles.imageWrapper}>
-                  <Image
-                    src={character.image}
-                    alt={character.name}
-                    width={200}
-                    height={200}
-                    className={styles.characterImage}
-                  />
-                  {/* Ajustado para mostrar APENAS o status, sem "Status: " */}
-                  <div className={styles.hoverOverlay}>
-                    <p className={`${styles.statusBadge} ${
-                      character.status === 'Dead'
-                        ? styles.dead
-                        : character.status === 'Alive'
-                        ? styles.alive
-                        : styles.unknown
-                    }`}>
-                      {character.status}
-                    </p>
+            {characters.map((character, index) => (
+              <motion.div
+                key={character.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: index * 0.05 }}
+              >
+                <Link
+                  href={`/characters/${character.id}`}
+                  className={`${styles.characterCard} ${character.status === 'Dead' ? styles.deadCharacterCard : ''}`}
+                  onMouseEnter={() => handleMouseEnter(character.id)}
+                  onMouseLeave={handleMouseLeave}
+                  onMouseMove={handleMouseMove}
+                >
+                  <div className={styles.imageWrapper}>
+                    <Image
+                      src={character.image}
+                      alt={character.name}
+                      width={200}
+                      height={200}
+                      className={styles.characterImage}
+                    />
+                    {hoveredCardId === character.id && (
+                      <div
+                        className={styles.statusPopup}
+                        style={{
+                          '--mouse-x': `${mousePosition.x}px`,
+                          '--mouse-y': `${mousePosition.y}px`,
+                        } as React.CSSProperties}
+                      >
+                        <span className={`${styles.statusBadge} ${
+                          character.status === 'Dead'
+                            ? styles.dead
+                            : character.status === 'Alive'
+                            ? styles.alive
+                            : styles.unknown
+                        }`}>
+                          {character.status}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                </div>
-                <div className={styles.info}>
-                  <h3>{character.name}</h3>
-                  <p>Espécie: {character.species}</p>
-                </div>
-              </Link>
+                  <div className={styles.info}>
+                    <h3>{character.name}</h3>
+                    <p>Espécie: {character.species}</p>
+                  </div>
+                </Link>
+              </motion.div>
             ))}
           </div>
 
@@ -195,13 +236,13 @@ export default function CharactersPage() {
             >
               «
             </button>
-            {totalPages > 0 && (
-                currentPage - Math.floor(getPageNumbers().length / 2) > 1 && (
-                    <>
-                        <button onClick={() => handlePageChange(1)}>1</button>
-                        {currentPage - Math.floor(getPageNumbers().length / 2) > 2 && <span className={styles.paginationEllipsis}>...</span>}
-                    </>
-                )
+            {totalPages > 0 && currentPage - Math.floor(getPageNumbers().length / 2) > 1 && (
+              <>
+                <button onClick={() => handlePageChange(1)}>1</button>
+                {currentPage - Math.floor(getPageNumbers().length / 2) > 2 && (
+                  <span className={styles.paginationEllipsis}>...</span>
+                )}
+              </>
             )}
             {getPageNumbers().map((pageNumber) => (
               <button
@@ -213,13 +254,13 @@ export default function CharactersPage() {
                 {pageNumber}
               </button>
             ))}
-            {totalPages > 0 && (
-                currentPage + Math.floor(getPageNumbers().length / 2) < totalPages && (
-                    <>
-                        {currentPage + Math.floor(getPageNumbers().length / 2) < totalPages - 1 && <span className={styles.paginationEllipsis}>...</span>}
-                        <button onClick={() => handlePageChange(totalPages)}>{totalPages}</button>
-                    </>
-                )
+            {totalPages > 0 && currentPage + Math.floor(getPageNumbers().length / 2) < totalPages && (
+              <>
+                {currentPage + Math.floor(getPageNumbers().length / 2) < totalPages - 1 && (
+                  <span className={styles.paginationEllipsis}>...</span>
+                )}
+                <button onClick={() => handlePageChange(totalPages)}>{totalPages}</button>
+              </>
             )}
             <button
               onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
@@ -230,6 +271,9 @@ export default function CharactersPage() {
           </div>
         </div>
       )}
+
+      {/* <-- AQUI: botão flutuante de voltar ao topo --> */}
+      <BackToTopButton />
     </main>
   );
 }

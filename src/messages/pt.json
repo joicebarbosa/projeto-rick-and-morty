@@ -1,0 +1,7 @@
+{
+  "searchPlaceholder": "Buscar personagem",
+  "searchButton": "Buscar",
+  "loading": "Carregando personagens...",
+  "noResults": "Nenhum personagem encontrado com o nome \"{name}\".",
+  "backToTop": "↑ Topo"
+}

@@ -1,0 +1,391 @@
+/* src/app/characters/characterDetail.module.css */
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8); /* Um pouco mais escuro para garantir o contraste com a imagem de fundo */
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  box-sizing: border-box;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.detailModal { /* Container principal do modal */
+  display: flex;
+  flex-direction: row;
+  max-width: 900px;
+  width: 100%;
+  height: 80vh;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9), 0 0 50px rgba(0, 240, 192, 0.2);
+  border: 1px solid rgba(0, 240, 192, 0.2);
+  animation: slideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  position: relative; /* Para posicionar o botão fechar absolutamente */
+  background-color: transparent;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(50px) scale(0.9); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Painel Esquerdo: Área para a imagem flutuante */
+.leftPanel {
+  flex: 0 0 35%;
+  min-width: 250px;
+  background-color: rgba(60, 60, 60, 0.4); /* Mais transparente: 0.4 */
+  position: relative;
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+  display: flex; /* Para centralizar o imageFloatCard dentro */
+  justify-content: center; /* Para centralizar o imageFloatCard dentro */
+  align-items: center; /* Para centralizar o imageFloatCard dentro */
+}
+
+/* Painel Direito: Conteúdo de detalhes */
+.rightContent {
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.4); /* Mais transparente: 0.4 */
+  padding: 25px; /* Reduzir um pouco o padding */
+  overflow-y: auto;
+  color: white;
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+/* Card da Imagem Flutuante */
+.imageFloatCard {
+  position: absolute; /* Agora é absoluto em relação ao .detailModal */
+  top: 50%; /* Centraliza verticalmente no .detailModal */
+  left: 0; /* Alinha o lado esquerdo do card com a borda esquerda do .detailModal */
+  transform: translate(-50%, -50%); /* Move 50% da sua largura para a esquerda para flutuar para fora */
+  
+  width: 250px; /* Largura do card flutuante */
+  height: 300px; /* Aumentar altura para acomodar imagem e texto */
+  background-color: rgba(0, 0, 0, 0.5); /* Fundo do card flutuante */
+  /* Remove padding para permitir que a imagem e o texto fiquem nas bordas */
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 192, 0.6);
+  border: 1px solid rgba(0, 240, 192, 0.3);
+  text-align: center;
+  z-index: 20;
+  display: flex;
+  flex-direction: column; /* Organiza imagem e texto verticalmente */
+  /* justify-content: space-between; /* Ajusta para imagem e texto */
+  /* align-items: center; */
+}
+
+.characterImage {
+  width: 100%; /* Preenche 100% da largura do card */
+  height: 250px; /* Altura fixa para a imagem, deixando espaço para o texto */
+  object-fit: cover; /* Garante que a imagem preencha sem deformar */
+  border-radius: 10px 10px 0 0; /* Arredondar apenas os cantos superiores da imagem */
+  box-shadow: none;
+  border: none;
+}
+
+.characterTextOverlay { /* Nova div para o texto no card */
+  background-color: rgba(60, 60, 60, 0.7); /* Fundo cinza transparente para o texto */
+  width: 100%;
+  padding: 8px 5px; /* Padding para o texto dentro da área cinza transparente */
+  border-radius: 0 0 10px 10px; /* Arredondar apenas os cantos inferiores */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1; /* Permite que essa div ocupe o espaço restante */
+}
+
+.floatingCharacterName {
+  font-size: 1.1rem;
+  color: #00f0c0;
+  margin-top: 0px; /* Ajustado para 0, padding da div pai controlará */
+  margin-bottom: 2px;
+  text-shadow: 0 0 4px rgba(0, 240, 192, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 90%;
+}
+
+.floatingCharacterSpecies {
+  font-size: 0.75rem;
+  color: #ccc;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Botão Fechar (agora fora do card e dentro do modal) */
+.closeButton {
+  position: absolute;
+  top: 15px; /* Ajuste para afastamento do topo */
+  right: 15px; /* Posicionado no canto superior direito do modal */
+  background-color: rgba(200, 200, 200, 0.15); /* Um pouco mais visível */
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 30; /* Garante que fique acima de outros elementos */
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #00f0c0;
+  border-color: #00f0c0;
+  box-shadow: 0 0 10px rgba(0, 240, 192, 0.5);
+}
+
+/* Estilos das seções de detalhes no rightContent (mantidos como na última versão) */
+.sectionTitle {
+  font-size: 1.3rem;
+  color: #00f0c0;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 240, 192, 0.2);
+  padding-bottom: 6px;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.8px;
+}
+
+.detailItem {
+  font-size: 1rem;
+  margin-bottom: 8px;
+  color: #e0e0e0;
+  line-height: 1.4;
+}
+
+.detailLabel {
+  font-weight: bold;
+  color: #fff;
+  margin-right: 6px;
+  min-width: 80px;
+  display: inline-block;
+}
+
+/* Estilo do Status Badge */
+.statusBadge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-transform: capitalize;
+  margin-left: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.aliveStatus {
+  background: #32cd32;
+  color: #1a1a1a;
+}
+
+.deadStatus {
+  background: #d9534f;
+  color: white;
+}
+
+.unknownStatus {
+  background: #6c757d;
+  color: white;
+}
+
+/* Estilos para loading e erro */
+.loadingContainer, .errorContainer {
+  background-color: rgba(40, 40, 40, 0.9);
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+  max-width: 450px;
+  width: 100%;
+  color: white;
+}
+
+.loadingContainer p {
+    font-size: 1.6rem;
+    color: #00f0c0;
+    margin: 0;
+}
+
+.errorText {
+  font-size: 1.2rem;
+  color: #ff6347;
+  margin-bottom: 15px;
+}
+
+.backButton {
+  display: inline-block;
+  background-color: #00f0c0;
+  color: #1a1a1a;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  margin-top: 15px;
+}
+
+.backButton:hover {
+  background-color: #00d4a8;
+  transform: translateY(-2px);
+}
+
+/* Responsividade */
+@media (max-width: 768px) { /* Tablets e telas menores */
+  .detailModal {
+    flex-direction: column;
+    height: auto;
+    max-height: 95vh;
+    overflow-y: auto;
+  }
+
+  .leftPanel {
+    flex: none;
+    width: 100%;
+    height: 250px; /* Ajustado para mobile para acomodar o card mais alto */
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .imageFloatCard {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    margin-left: 0;
+    margin-top: 15px;
+    width: 180px; /* Ajustado para mobile */
+    height: 230px; /* Ajustado para mobile */
+    padding: 0; /* Remover padding para mobile também */
+    /* Re-centraliza para o modo mobile */
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .characterImage {
+    width: 100%;
+    height: 180px; /* Ajustado para mobile */
+    border-radius: 10px 10px 0 0;
+  }
+
+  .characterTextOverlay {
+    padding: 6px 5px; /* Ajuste padding para mobile */
+    border-radius: 0 0 10px 10px;
+  }
+
+  .floatingCharacterName {
+    font-size: 1.1rem;
+  }
+
+  .floatingCharacterSpecies {
+    font-size: 0.75rem;
+  }
+
+  .closeButton {
+    top: 8px;
+    right: 10px;
+    font-size: 0.8rem;
+    padding: 5px 10px;
+  }
+
+  .rightContent {
+    flex: none;
+    width: 100%;
+    padding: 18px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .sectionTitle {
+    font-size: 1.2rem;
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 8px;
+  }
+
+  .detailItem {
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+  }
+
+  .detailLabel {
+      min-width: 50px;
+      margin-right: 4px;
+  }
+
+  .statusBadge {
+      font-size: 0.75rem;
+      padding: 2px 6px;
+  }
+}
+
+@media (max-width: 480px) { /* Celulares menores */
+    .leftPanel {
+        height: 220px;
+    }
+
+    .imageFloatCard {
+        width: 160px;
+        height: 200px;
+    }
+
+    .characterImage {
+        width: 100%;
+        height: 150px;
+    }
+
+    .characterTextOverlay {
+      padding: 5px;
+    }
+
+    .floatingCharacterName {
+        font-size: 1rem;
+    }
+
+    .floatingCharacterSpecies {
+        font-size: 0.7rem;
+    }
+
+    .closeButton {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+    }
+
+    .rightContent {
+        padding: 12px;
+    }
+
+    .sectionTitle {
+        font-size: 1.1rem;
+    }
+
+    .detailItem {
+        font-size: 0.85rem;
+    }
+
+    .detailLabel {
+        min-width: 45px;
+    }
+
+    .statusBadge {
+        font-size: 0.65rem;
+    }
+}

@@ -1,0 +1,116 @@
+/* src/app/page.module.css */
+
+.main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    filter: brightness(0.8);
+}
+
+.logoContainer {
+    margin-bottom: 20px; /* Margem da logo */
+    z-index: 1;
+}
+
+/* Formulário de Busca - Menor e Mais Discreto */
+.searchForm {
+    display: flex;
+    gap: 8px; /* Espaço entre input e botão ligeiramente reduzido */
+    margin-bottom: 40px;
+    z-index: 1;
+    width: 100%;
+    max-width: 300px; /* Largura máxima reduzida para o formulário */
+    justify-content: center;
+}
+
+.searchInput {
+    flex-grow: 1;
+    padding: 7px 10px; /* Reduzido o padding */
+    border: 1px solid rgba(0, 240, 192, 0.3); /* Borda ainda mais discreta */
+    border-radius: 5px; /* Levemente menos arredondado */
+    background-color: rgba(30, 30, 30, 0.6); /* Fundo um pouco mais transparente */
+    color: #e0e0e0;
+    font-size: 0.85rem; /* Fonte menor */
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.searchInput::placeholder {
+    color: #909090; /* Cor do placeholder mais discreta */
+}
+
+.searchInput:focus {
+    border-color: #00f0c0;
+    box-shadow: 0 0 7px rgba(0, 240, 192, 0.5); /* Sombra de foco ligeiramente menor */
+    background-color: rgba(40, 40, 40, 0.7); /* Fundo ligeiramente mais claro no foco */
+}
+
+.searchButton {
+    padding: 7px 16px; /* Reduzido o padding */
+    background-color: #00f0c0;
+    color: #1a1a1a;
+    border: none;
+    border-radius: 5px; /* Levemente menos arredondado */
+    cursor: pointer;
+    font-size: 0.85rem; /* Fonte menor */
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    white-space: nowrap;
+}
+
+.searchButton:hover {
+    background-color: #00d4a8;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 240, 192, 0.3); /* Sombra menor no hover */
+}
+
+.searchButton:active {
+    transform: translateY(0);
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.15); /* Sombra mais discreta no active */
+}
+
+/* Estilos para o link "Voltar para Início" na página de detalhes, se houver */
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 30px;
+    color: #00f0c0;
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: color 0.3s ease, transform 0.2s ease;
+    position: absolute; /* Para posicionar no canto superior esquerdo */
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 8px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 240, 192, 0.2);
+}
+
+.backLink:hover {
+    color: #00d4a8;
+    transform: translateX(-5px);
+    background-color: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 15px rgba(0, 240, 192, 0.3);
+}
+
+.backLink svg {
+    font-size: 1.2rem;
+}
