@@ -1,10 +1,11 @@
-// src/app/characters/[id]/page.tsx
+// src/app/[locale]/characters/[id]/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { request, gql } from 'graphql-request';
 import Image from 'next/image';
+import { useTranslations, useLocale } from 'next-intl'; // Importa useTranslations e useLocale
 import styles from './characterDetail.module.css';
 
 const API_URL = 'https://rickandmortyapi.com/graphql';
@@ -34,6 +35,8 @@ export default function CharacterDetailPage() {
   const params = useParams();
   const characterId = params.id as string;
   const router = useRouter();
+  const t = useTranslations(); // Hook de tradução
+  const locale = useLocale(); // Hook para o idioma atual
 
   const [character, setCharacter] = useState<CharacterDetailData['character']>(null);
   const [loading, setLoading] = useState(true);
@@ -42,7 +45,7 @@ export default function CharacterDetailPage() {
   useEffect(() => {
     if (!characterId) {
       setLoading(false);
-      setError('ID do personagem não fornecido.');
+      setError(t('characterIdNotFound')); // Usa tradução
       return;
     }
 
@@ -84,15 +87,15 @@ export default function CharacterDetailPage() {
         if (data.character) {
           setCharacter(data.character);
         } else {
-          setError(`Personagem com ID "${characterId}" não encontrado.`);
+          setError(t('characterNotFound', { id: characterId })); // Usa tradução
         }
       } catch (err: unknown) {
         if (err instanceof Error) {
           console.error('Erro ao buscar detalhes do personagem:', err.message);
-          setError(`Não foi possível carregar os detalhes do personagem: ${err.message}`);
+          setError(t('detailErrorMessage', { message: err.message })); // Usa tradução
         } else {
           console.error('Erro desconhecido ao buscar detalhes do personagem:', err);
-          setError('Erro desconhecido ao carregar os detalhes do personagem.');
+          setError(t('detailUnknownErrorMessage')); // Usa tradução
         }
       } finally {
         setLoading(false);
@@ -100,13 +103,13 @@ export default function CharacterDetailPage() {
     };
 
     fetchCharacter();
-  }, [characterId]);
+  }, [characterId, t]); // Adiciona 't' como dependência
 
   if (loading) {
     return (
       <div className={styles.overlay}>
         <div className={styles.loadingContainer}>
-          <p>Carregando detalhes do personagem...</p>
+          <p>{t('loadingDetail')}</p> {/* Usa tradução */}
         </div>
       </div>
     );
@@ -117,8 +120,8 @@ export default function CharacterDetailPage() {
       <div className={styles.overlay}>
         <div className={styles.errorContainer}>
           <p className={styles.errorText}>{error}</p>
-          <button onClick={() => router.back()} className={styles.backButton}>
-            Voltar para a Busca
+          <button onClick={() => router.push(`/${locale}/characters`)} className={styles.backButton}> {/* Usa idioma atual */}
+            {t('backToSearch')} {/* Usa tradução */}
           </button>
         </div>
       </div>
@@ -129,9 +132,9 @@ export default function CharacterDetailPage() {
     return (
       <div className={styles.overlay}>
         <div className={styles.errorContainer}>
-          <p className={styles.errorText}>Dados do personagem não disponíveis.</p>
-          <button onClick={() => router.back()} className={styles.backButton}>
-            Voltar para a Busca
+          <p className={styles.errorText}>{t('characterDataNotAvailable')}</p> {/* Usa tradução */}
+          <button onClick={() => router.push(`/${locale}/characters`)} className={styles.backButton}> {/* Usa idioma atual */}
+            {t('backToSearch')} {/* Usa tradução */}
           </button>
         </div>
       </div>
@@ -141,18 +144,18 @@ export default function CharacterDetailPage() {
   return (
     <div className={styles.overlay}>
       <div className={styles.detailModal}> {/* Container principal do modal */}
-        <button onClick={() => router.back()} className={styles.closeButton}>
-          Fechar
+        <button onClick={() => router.push(`/${locale}/characters`)} className={styles.closeButton}> {/* Usa idioma atual */}
+          {t('closeButton')} {/* Usa tradução */}
         </button>
-        {/* **MOVIDO PARA CÁ: Card da Imagem Flutuante (agora filho direto de .detailModal)** */}
+        {/* Card da Imagem Flutuante (agora filho direto de .detailModal) */}
         <div className={styles.imageFloatCard}>
           <Image
             src={character.image}
             alt={character.name}
-            width={200} // Tamanho da imagem dentro do card
-            height={200} // Tamanho da imagem dentro do card
+            width={200}
+            height={200}
             className={styles.characterImage}
-            style={{ objectFit: 'cover' }} // Garante que a imagem preencha sem deformar
+            style={{ objectFit: 'cover' }}
           />
           <div className={styles.characterTextOverlay}>
             <h2 className={styles.floatingCharacterName}>{character.name}</h2>
@@ -168,9 +171,9 @@ export default function CharacterDetailPage() {
         {/* Painel Direito: Conteúdo do personagem (SOBRE, ORIGEM, LOCALIDADE) */}
         <div className={styles.rightContent}>
           {/* SOBRE */}
-          <h3 className={styles.sectionTitle}>SOBRE</h3>
+          <h3 className={styles.sectionTitle}>{t('aboutSectionTitle')}</h3>
           <p className={styles.detailItem}>
-            <span className={styles.detailLabel}>Status:</span>
+            <span className={styles.detailLabel}>{t('statusLabel')}:</span>
             <span className={`${styles.statusBadge} ${
               character.status === 'Dead'
                 ? styles.deadStatus
@@ -182,46 +185,46 @@ export default function CharacterDetailPage() {
             </span>
           </p>
           <p className={styles.detailItem}>
-            <span className={styles.detailLabel}>Espécie:</span> {character.species}
+            <span className={styles.detailLabel}>{t('speciesLabel')}:</span> {character.species}
           </p>
           <p className={styles.detailItem}>
-            <span className={styles.detailLabel}>Gênero:</span> {character.gender}
+            <span className={styles.detailLabel}>{t('genderLabel')}:</span> {character.gender}
           </p>
           {character.type && character.type !== "" && (
             <p className={styles.detailItem}>
-              <span className={styles.detailLabel}>Tipo:</span> {character.type}
+              <span className={styles.detailLabel}>{t('typeLabel')}:</span> {character.type}
             </p>
           )}
 
           {/* ORIGEM */}
-          <h3 className={styles.sectionTitle}>ORIGEM</h3>
+          <h3 className={styles.sectionTitle}>{t('originSectionTitle')}</h3>
           <p className={styles.detailItem}>
-            <span className={styles.detailLabel}>Nome:</span> {character.origin.name}
+            <span className={styles.detailLabel}>{t('nameLabel')}:</span> {character.origin.name}
           </p>
           {character.origin.type && character.origin.type !== "unknown" && (
               <p className={styles.detailItem}>
-                  <span className={styles.detailLabel}>Tipo:</span> {character.origin.type}
+                  <span className={styles.detailLabel}>{t('typeLabel')}:</span> {character.origin.type}
               </p>
           )}
           {character.origin.dimension && character.origin.dimension !== "unknown" && (
               <p className={styles.detailItem}>
-                  <span className={styles.detailLabel}>Dimensão:</span> {character.origin.dimension}
+                  <span className={styles.detailLabel}>{t('dimensionLabel')}:</span> {character.origin.dimension}
               </p>
           )}
 
           {/* LOCALIDADE */}
-          <h3 className={styles.sectionTitle}>LOCALIDADE</h3>
+          <h3 className={styles.sectionTitle}>{t('locationSectionTitle')}</h3>
           <p className={styles.detailItem}>
-            <span className={styles.detailLabel}>Nome:</span> {character.location.name}
+            <span className={styles.detailLabel}>{t('nameLabel')}:</span> {character.location.name}
           </p>
           {character.location.type && character.location.type !== "unknown" && (
               <p className={styles.detailItem}>
-                  <span className={styles.detailLabel}>Tipo:</span> {character.location.type}
+                  <span className={styles.detailLabel}>{t('typeLabel')}:</span> {character.location.type}
               </p>
           )}
           {character.location.dimension && character.location.dimension !== "unknown" && (
               <p className={styles.detailItem}>
-                  <span className={styles.detailLabel}>Dimensão:</span> {character.location.dimension}
+                  <span className={styles.detailLabel}>{t('dimensionLabel')}:</span> {character.location.dimension}
               </p>
           )}
         </div>

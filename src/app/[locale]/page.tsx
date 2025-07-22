@@ -1,8 +1,9 @@
+// src/app/[locale]/page.tsx
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl'; // Importa useLocale
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -12,6 +13,7 @@ export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
   const t = useTranslations();
+  const locale = useLocale(); // Obtém o idioma atual
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -21,9 +23,9 @@ export default function HomePage() {
     event.preventDefault();
     const trimmedTerm = searchTerm.trim();
     if (trimmedTerm) {
-      router.push(`/pt/characters?name=${trimmedTerm}`);
+      router.push(`/${locale}/characters?name=${trimmedTerm}`); // Usa o idioma atual
     } else {
-      router.push(`/pt/characters`);
+      router.push(`/${locale}/characters`); // Usa o idioma atual
     }
   };
 
@@ -53,7 +55,7 @@ export default function HomePage() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <Link href="/">
+        <Link href={`/${locale}`}> {/* Link para a home page com o idioma atual */}
           <Image
             src="/assets/logo.png"
             alt="Rick and Morty Logo"

@@ -1,11 +1,13 @@
+// src/app/[locale]/characters/page.tsx
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl'; // Importa useTranslations e useLocale
 import styles from './characters.module.css';
-import homeStyles from '../page.module.css';
+import homeStyles from '../page.module.css'; // Mantido, mas considere refatorar se os estilos forem globais
 import { motion } from 'framer-motion';
 import BackToTopButton from '@/components/BackToTopButton';
 
@@ -20,6 +22,8 @@ interface Character {
 export default function CharactersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations(); // Hook de tradução
+  const locale = useLocale(); // Hook para o idioma atual
 
   const initialSearchTerm = searchParams.get('name') || '';
   const initialPage = Number(searchParams.get('page')) || 1;
@@ -47,22 +51,23 @@ export default function CharactersPage() {
       } else {
         setCharacters([]);
         setTotalPages(1);
-        setError(data.error || `Nenhum personagem encontrado com o nome "${name}".`);
+        // Usa useTranslations para a mensagem de erro
+        setError(data.error || t('noResults', { name: name }));
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error('Erro ao buscar personagens:', err.message);
-        setError(`Erro ao carregar os personagens: ${err.message}`);
+        setError(t('errorMessage', { message: err.message })); // Exemplo de tradução para erro
       } else {
         console.error('Erro desconhecido ao buscar personagens:', err);
-        setError('Erro desconhecido ao carregar os personagens.');
+        setError(t('unknownErrorMessage')); // Exemplo de tradução para erro desconhecido
       }
       setCharacters([]);
       setTotalPages(1);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]); // Adiciona 't' como dependência para useCallback
 
   useEffect(() => {
     const currentName = searchParams.get('name') || '';
@@ -80,7 +85,8 @@ export default function CharactersPage() {
       params.delete('name');
     }
     params.set('page', String(page));
-    router.push(`?${params.toString()}`);
+    // Inclui o prefixo do idioma na URL
+    router.push(`/${locale}/characters?${params.toString()}`);
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -144,7 +150,7 @@ export default function CharactersPage() {
       </div>
 
       <div className={homeStyles.logoContainer}>
-        <Link href="/">
+        <Link href={`/${locale}`}> {/* Link para a home page com o idioma atual */}
           <Image
             src="/assets/logo.png"
             alt="Rick and Morty Logo"
@@ -159,21 +165,23 @@ export default function CharactersPage() {
         <input
           type="text"
           name="search"
-          placeholder="Buscar personagem"
+          placeholder={t('searchPlaceholder')} {/* Usa tradução */}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className={homeStyles.searchInput}
         />
-        <button type="submit" className={homeStyles.searchButton}>Buscar</button>
+        <button type="submit" className={homeStyles.searchButton}>
+          {t('searchButton')} {/* Usa tradução */}
+        </button>
       </form>
 
       {loading && characters.length === 0 ? (
-        <p className={styles.loadingMessage}>Carregando personagens...</p>
+        <p className={styles.loadingMessage}>{t('loading')}</p> {/* Usa tradução */}
       ) : error ? (
         <p className={styles.error}>{error}</p>
       ) : characters.length === 0 ? (
         <p className={styles.noResults}>
-          Nenhum personagem encontrado com o nome "{searchTerm}".
+          {t('noResults', { name: searchTerm })} {/* Usa tradução */}
         </p>
       ) : (
         <div className={styles.gridContainer}>
@@ -186,7 +194,7 @@ export default function CharactersPage() {
                 transition={{ duration: 0.4, delay: index * 0.05 }}
               >
                 <Link
-                  href={`/characters/${character.id}`}
+                  href={`/${locale}/characters/${character.id}`} {/* Link dinâmico com idioma */}
                   className={`${styles.characterCard} ${character.status === 'Dead' ? styles.deadCharacterCard : ''}`}
                   onMouseEnter={() => handleMouseEnter(character.id)}
                   onMouseLeave={handleMouseLeave}
@@ -222,7 +230,7 @@ export default function CharactersPage() {
                   </div>
                   <div className={styles.info}>
                     <h3>{character.name}</h3>
-                    <p>Espécie: {character.species}</p>
+                    <p>{t('speciesLabel')}: {character.species}</p> {/* Exemplo de tradução */}
                   </div>
                 </Link>
               </motion.div>
@@ -272,7 +280,6 @@ export default function CharactersPage() {
         </div>
       )}
 
-      {/* <-- AQUI: botão flutuante de voltar ao topo --> */}
       <BackToTopButton />
     </main>
   );
