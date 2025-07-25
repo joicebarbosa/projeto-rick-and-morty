@@ -4,13 +4,13 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-// Importa 'locales' diretamente do i18n.ts consolidado para generateStaticParams
-import { locales } from '../../i18n'; // Caminho relativo de src/app/[locale]/ para src/i18n.ts
+import { locales, Locale } from '../../i18n';
 import PageTransition from '@/components/PageTransition';
 import LocaleSwitcher from '@/components/LocaleSwitcher';
+import getRequestConfig from '../../i18n';
 
-const geistSans = Geist({ subsets: ['latin'], variable: '--font-geist-sans' }); // Corrigido para '--font-geist-sans'
-const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' }); // Corrigido para '--font-geist-mono'
+const geistSans = Geist({ subsets: ['latin'], variable: '--font-geist-sans' });
+const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' });
 
 export const metadata: Metadata = {
   title: 'Rick & Morty Challenge',
@@ -28,27 +28,22 @@ export default async function LocaleLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  const locale = params.locale;
+  // CORREÇÃO: Use `await` para desestruturar 'params'
+  const { locale } = await params;
 
-  // A validação do locale pode ser feita aqui ou no i18n.ts.
-  // Se o i18n.ts já faz, aqui é opcional, mas não prejudica.
-  if (!locales.includes(locale)) notFound();
+  if (!locales.includes(locale as Locale)) notFound();
 
   let messages;
   try {
-    // Importa a função getRequestConfig do i18n.ts e a executa
-    const getRequestConfigModule = await import('../../i18n'); // Caminho relativo de src/app/[locale]/ para src/i18n.ts
-    const requestConfig = getRequestConfigModule.default;
-    const config = await requestConfig({ locale });
-    messages = config.messages;
+    messages = (await getRequestConfig({ locale })).messages;
   } catch (error) {
     console.error("Failed to load messages for locale:", locale, error);
-    notFound(); // Redireciona para 404 se as mensagens não puderem ser carregadas
+    notFound();
   }
 
   return (
     <html lang={locale}>
-      <body className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning={true}> {/* ADICIONADO suppressHydrationWarning */}
+      <body className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning={true}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <LocaleSwitcher />
           <PageTransition>{children}</PageTransition>

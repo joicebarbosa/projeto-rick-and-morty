@@ -3,6 +3,8 @@
   "searchButton": "Buscar",
   "loading": "Carregando personagens...",
   "noResults": "Nenhum personagem encontrado com o nome \"{name}\".",
-  "backToTop": "↑ Topo"
+  "backToTop": "↑ Topo",
+  "speciesLabel": "Espécie",
+  "errorMessage": "Falha ao carregar personagens: {message}",
+  "unknownErrorMessage": "Ocorreu um erro desconhecido ao carregar os personagens."
 }
-

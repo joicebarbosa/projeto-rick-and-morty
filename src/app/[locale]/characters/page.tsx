@@ -165,7 +165,7 @@ export default function CharactersPage() {
         <input
           type="text"
           name="search"
-          placeholder={t('searchPlaceholder')} {/* Usa tradução */}
+          placeholder={t('searchPlaceholder')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className={homeStyles.searchInput}
@@ -176,12 +176,12 @@ export default function CharactersPage() {
       </form>
 
       {loading && characters.length === 0 ? (
-        <p className={styles.loadingMessage}>{t('loading')}</p> {/* Usa tradução */}
+        <p className={styles.loadingMessage}>{t('loading')}</p> 
       ) : error ? (
         <p className={styles.error}>{error}</p>
       ) : characters.length === 0 ? (
         <p className={styles.noResults}>
-          {t('noResults', { name: searchTerm })} {/* Usa tradução */}
+          {t('noResults', { name: searchTerm })} 
         </p>
       ) : (
         <div className={styles.gridContainer}>
@@ -194,13 +194,15 @@ export default function CharactersPage() {
                 transition={{ duration: 0.4, delay: index * 0.05 }}
               >
                 <Link
-                  href={`/${locale}/characters/${character.id}`} {/* Link dinâmico com idioma */}
+                  href={`/${locale}/characters/${character.id}`} 
                   className={`${styles.characterCard} ${character.status === 'Dead' ? styles.deadCharacterCard : ''}`}
                   onMouseEnter={() => handleMouseEnter(character.id)}
                   onMouseLeave={handleMouseLeave}
-                  onMouseMove={handleMouseMove}
                 >
-                  <div className={styles.imageWrapper}>
+                  <div
+                    className={styles.imageWrapper}
+                    onMouseMove={handleMouseMove}
+                  >
                     <Image
                       src={character.image}
                       alt={character.name}

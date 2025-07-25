@@ -3,5 +3,8 @@
   "searchButton": "Search",
   "loading": "Loading characters...",
   "noResults": "No characters found with the name \"{name}\".",
-  "backToTop": "↑ Top"
+  "backToTop": "↑ Top",
+  "speciesLabel": "Species",
+  "errorMessage": "Failed to fetch characters: {message}",
+  "unknownErrorMessage": "An unknown error occurred while fetching characters."
 }
