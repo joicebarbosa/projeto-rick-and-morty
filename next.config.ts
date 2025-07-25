@@ -1,16 +1,7 @@
 // next.config.ts
+import createNextIntlPlugin from 'next-intl/plugin';
 
-const nextConfig = {
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'rickandmortyapi.com',
-        pathname: '/api/character/avatar/**'
-      }
-    ]
-  }
-};
+// Passamos o caminho exato do seu arquivo de configuração i18n.ts
+const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
-export default nextConfig;
-
+export default withNextIntl({});
