@@ -14,22 +14,25 @@ export default function LocaleSwitcher() {
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newLocale = e.target.value;
     const newPath = pathname.replace(`/${currentLocale}`, `/${newLocale}`);
+    playClick(); // toca o som
     router.push(newPath);
   };
 
   return (
-    <select value={currentLocale} onChange={handleChange} style={{ position: 'fixed', top: 10, right: 10, zIndex: 100 }}>
-      {locales.map((loc) => (
-        <option key={loc} value={loc}>
-          {loc.toUpperCase()}
-        </option>
-      ))}
-    </select>
-
-    <button onClick={() => {
-  playClick();
-  // mudar idioma...
-}}>
-
+    <div style={{ position: 'fixed', top: 10, right: 10, zIndex: 100 }}>
+      <label htmlFor="locale-select" style={{ marginRight: 8 }}>🌐</label>
+      <select
+        id="locale-select"
+        value={currentLocale}
+        onChange={handleChange}
+        aria-label="Trocar idioma"
+      >
+        {locales.map((loc) => (
+          <option key={loc} value={loc}>
+            {loc.toUpperCase()}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
