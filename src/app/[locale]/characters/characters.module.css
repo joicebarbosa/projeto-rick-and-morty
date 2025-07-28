@@ -358,3 +358,8 @@
         padding: 0px 2px;
     }
 }
+
+.deadCharacterImage {
+  filter: grayscale(100%);
+  transition: filter 0.3s ease-in-out; /* Adiciona uma transição suave */
+}

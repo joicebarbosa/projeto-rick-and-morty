@@ -208,7 +208,8 @@ export default function CharactersPage() {
                       alt={character.name}
                       width={200}
                       height={200}
-                      className={styles.characterImage}
+                      // Aplica a classe condicionalmente
+                      className={`${styles.characterImage} ${character.status === 'Dead' ? styles.deadCharacterImage : ''}`}
                     />
                     {hoveredCardId === character.id && (
                       <div

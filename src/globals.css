@@ -17,11 +17,12 @@ body {
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+   margin: 0;
+  padding: 0;
+  background: radial-gradient(circle at center, #0f0c29, #302b63, #24243e);
+  background-size: 200% 200%;
+  animation: gradientShift 15s ease infinite;
+  color: white;
 }
 
 * {
@@ -59,4 +60,16 @@ a {
 
 .backToTop:hover {
   background-color: #00d4a8;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }

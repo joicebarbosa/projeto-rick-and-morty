@@ -6,9 +6,12 @@
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    padding: 2rem;
+    padding: 1rem; /* Reduzido o padding geral, especialmente o superior */
     position: relative;
     overflow-x: hidden;
+    /* Ajuste principal para mover para cima */
+    padding-top: 5vh; /* Ajuste para mover o conteúdo para o topo, mantendo um pouco de espaço */
+    justify-content: flex-start; /* Alinha o conteúdo ao início do eixo principal (topo) */
 }
 
 .background {
@@ -23,15 +26,16 @@
 }
 
 .logoContainer {
-    margin-bottom: 20px; /* Margem da logo */
+    margin-bottom: 5px; /* Reduzido a margem inferior para aproximar do formulário */
     z-index: 1;
+    margin-top: 0; /* Garante que não há margem superior extra */
 }
 
 /* Formulário de Busca - Menor e Mais Discreto */
 .searchForm {
     display: flex;
     gap: 8px; /* Espaço entre input e botão ligeiramente reduzido */
-    margin-bottom: 40px;
+    margin-bottom: 20px; /* Reduzido a margem inferior para aproximar de outros conteúdos (se houver) */
     z-index: 1;
     width: 100%;
     max-width: 300px; /* Largura máxima reduzida para o formulário */

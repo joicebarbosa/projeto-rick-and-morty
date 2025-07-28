@@ -1,0 +1,149 @@
+FALTANTES OU MELHORIAS (baseado no briefing completo)
+1. Melhorar ainda mais a experiência visual com efeitos futuristas
+Você já tem efeitos bons, mas podemos evoluir com:
+
+✅ Parallax leve no background
+
+✅ Animações de entrada com Framer Motion
+
+✅ Hover futuristas com gradientes animados ou brilho
+
+✅ Transições suaves entre páginas
+
+✅ Modo escuro ativado por botão?
+
+2. Internacionalização (i18n)
+⚠️ Não implementado ainda
+
+Sugestão: usar next-intl ou next-i18next
+
+Pode ter PT/EN com botão no topo
+
+3. Acessibilidade
+⚠️ Sem foco visual/navegação por teclado
+
+Adicionar aria-label, tabIndex, roles e testes com axe-core
+
+4. Animações com Framer Motion
+🚀 Adicionar animações suaves de entrada:
+
+tsx
+Copiar
+Editar
+import { motion } from "framer-motion";
+
+<motion.div
+  initial={{ opacity: 0, y: 30 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.4 }}
+>
+  {/* Conteúdo */}
+</motion.div>
+5. Testes (unitários + integração + E2E)
+❌ Ainda não implementado
+
+Unitário + Integração: usar Jest + Testing Library
+
+E2E: usar Cypress ou Playwright
+
+Exemplos:
+
+src/__tests__/HomePage.test.tsx
+
+Testar a busca, paginador, renderização dos cards
+
+6. README completo
+❌ Ainda não fornecido
+
+✅ Explique: objetivo, tecnologias usadas, como rodar (npm install && npm run dev), build, testes, e publicação.
+
+7. Publicação no GitHub Pages ou Vercel
+❌ Não publicado ainda
+
+✅ Subir para o GitHub
+
+✅ Deploy gratuito na Vercel (Next.js se encaixa perfeitamente)
+
+8. Lint, Prettier, Husky, Commitlint
+❌ Não implementado
+
+Usar:
+
+bash
+Copiar
+Editar
+npm i -D eslint prettier husky lint-staged @commitlint/{config-conventional,cli}
+📌 ROTEIRO DE EXECUÇÃO (do ponto onde você está até a entrega final)
+ETAPA 1: Finalização Visual
+ Adicionar efeitos com Framer Motion
+
+ Adicionar efeitos de parallax suave (ex: no fundo, usando scrollY)
+
+ Botão "modo escuro" (opcional, já que prefers-color-scheme está presente)
+
+ETAPA 2: Internacionalização (i18n)
+ Usar next-intl e criar arquivos pt.json e en.json
+
+ Adicionar botão de troca de idioma no canto superior direito
+
+ETAPA 3: Testes Automatizados
+ Criar __tests__/HomePage.test.tsx com React Testing Library
+
+ Criar __tests__/CharactersPage.test.tsx
+
+ Instalar Cypress para testes de fluxo (pesquisa, detalhe)
+
+ETAPA 4: Acessibilidade
+ Testar com axe-core browser extension
+
+ Corrigir avisos (aria-label, role, tabIndex)
+
+ Suporte para navegação por teclado
+
+ETAPA 5: README + Deploy
+ Criar README com:
+
+Preview (print ou gif)
+
+Tecnologias usadas
+
+Como rodar
+
+Testes
+
+Features implementadas
+
+ Deploy na Vercel com botão direto de deploy (vercel deploy ou GitHub)
+
+ETAPA 6: Configuração de Lint, Prettier, Husky
+ Criar .eslintrc, .prettierrc
+
+ Husky para ganchos de commit
+
+ Commitlint + Conventional Commits
+
+✨ Extras para impacto visual
+Animações de scroll reveal
+
+Transições entre rotas com framer-motion + AnimatePresence
+
+Gradientes animados no fundo (radial-gradient + animation)
+
+Som de clique sutil ao navegar (acessível, mas opcional)
+
+🔚 Conclusão
+Você já fez 80% do projeto com excelente qualidade. O foco agora é:
+
+💥 Polir a experiência visual
+
+✅ Garantir acessibilidade
+
+✅ Adicionar testes mínimos
+
+✅ Fazer deploy + readme completo
+
+✅ Usar boas práticas modernas
+
+Se quiser, posso te ajudar a configurar cada etapa, te dar os trechos de código prontos, ou revisar conforme for implementando.
+
+Quer que eu comece te guiando pela etapa visual com Framer Motion agora? Ou prefere já atacar a parte de testes?

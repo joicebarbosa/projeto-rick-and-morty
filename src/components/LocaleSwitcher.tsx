@@ -3,11 +3,13 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { locales } from '@/i18n';
+import { useClickSound } from '@/utils/useClickSound';
 
 export default function LocaleSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
   const currentLocale = useLocale();
+  const playClick = useClickSound();
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newLocale = e.target.value;
@@ -23,5 +25,11 @@ export default function LocaleSwitcher() {
         </option>
       ))}
     </select>
+
+    <button onClick={() => {
+  playClick();
+  // mudar idioma...
+}}>
+
   );
 }
