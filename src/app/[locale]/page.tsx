@@ -80,20 +80,26 @@ export default function HomePage() {
           onChange={handleSearchChange}
           className={styles.searchInput}
         />
-        <button type="submit" className={styles.searchButton}>
-          {t('searchButton')}
-        </button>
+       <motion.button
+              whileHover={{ scale: 1.05, backgroundColor: '#00ffaa' }}
+              whileTap={{ scale: 0.95 }}
+              type="submit"
+              className={styles.searchButton}
+>
+               {t('searchButton')}
+       </motion.button>
       </motion.form>
 
     <button
-      onClick={() => {
-        const audio = new Audio('/sounds/click.mp3');
-        audio.volume = 0.5;
-        audio.play().catch((err) => console.error('Erro ao tocar som:', err));
-      }}
-    >
-      Testar som
-    </button>
+     onClick={() => {
+    const audio = new Audio('/sounds/click.wav');
+    audio.volume = 0.5;
+    audio.play().catch((err) => console.error('Erro ao tocar som:', err));
+  }}
+>
+  Testar som
+</button>
+
 
     </motion.main>
 

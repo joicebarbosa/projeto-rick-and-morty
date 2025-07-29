@@ -1,4 +1,3 @@
-// src/app/[locale]/layout.tsx
 import '@/globals.css';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
@@ -22,6 +21,17 @@ export async function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
+// ✅ Componente client-only para efeitos
+function ClientEffectsWrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <RouteSoundEffect />
+      <LocaleSwitcher />
+      {children}
+    </>
+  );
+}
+
 export default async function LocaleLayout({
   children,
   params,
@@ -29,8 +39,7 @@ export default async function LocaleLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  // CORREÇÃO: Use `await` para desestruturar 'params'
-  const { locale } = await params;
+  const { locale } = params;
 
   if (!locales.includes(locale as Locale)) notFound();
 
@@ -38,17 +47,17 @@ export default async function LocaleLayout({
   try {
     messages = (await getRequestConfig({ locale })).messages;
   } catch (error) {
-    console.error("Failed to load messages for locale:", locale, error);
+    console.error('Erro ao carregar mensagens:', locale, error);
     notFound();
   }
 
   return (
     <html lang={locale}>
-      <body className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning={true}>
+      <body className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <LocaleSwitcher />
-          <RouteSoundEffect />
-          <PageTransition>{children}</PageTransition>
+          <ClientEffectsWrapper>
+            <PageTransition>{children}</PageTransition>
+          </ClientEffectsWrapper>
         </NextIntlClientProvider>
       </body>
     </html>

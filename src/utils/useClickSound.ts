@@ -1,17 +1,16 @@
-// src/utils/useClickSound.ts
 export function useClickSound() {
-  if (typeof window === 'undefined') return () => {};
+  const audio =
+    typeof Audio !== 'undefined' ? new Audio('/sounds/click.wav') : null;
 
-  const audio = new Audio('/sounds/click.mp3');
-  audio.volume = 0.3;
-
-  return () => {
-    audio.currentTime = 0;
-    audio.play().catch((err) => {
-      // Usuário não interagiu com a página ainda (autoplay policy)
-      console.warn('Falha ao reproduzir som:', err);
-    });
+  const play = () => {
+    if (audio) {
+      audio.currentTime = 0;
+      audio.volume = 0.5;
+      audio.play().catch((err) => {
+        console.error('Erro ao tocar som:', err);
+      });
+    }
   };
+
+  return play;
 }
-
-
