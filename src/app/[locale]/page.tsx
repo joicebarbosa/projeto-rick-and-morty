@@ -84,6 +84,20 @@ export default function HomePage() {
           {t('searchButton')}
         </button>
       </motion.form>
+
+    <button
+      onClick={() => {
+        const audio = new Audio('/sounds/click.mp3');
+        audio.volume = 0.5;
+        audio.play().catch((err) => console.error('Erro ao tocar som:', err));
+      }}
+    >
+      Testar som
+    </button>
+
     </motion.main>
+
+
+
   );
 }

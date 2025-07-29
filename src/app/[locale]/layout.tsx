@@ -8,6 +8,7 @@ import { locales, Locale } from '../../i18n';
 import PageTransition from '@/components/PageTransition';
 import LocaleSwitcher from '@/components/LocaleSwitcher';
 import getRequestConfig from '../../i18n';
+import RouteSoundEffect from '@/components/RouteSoundEffect';
 
 const geistSans = Geist({ subsets: ['latin'], variable: '--font-geist-sans' });
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' });
@@ -46,6 +47,7 @@ export default async function LocaleLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning={true}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <LocaleSwitcher />
+          <RouteSoundEffect />
           <PageTransition>{children}</PageTransition>
         </NextIntlClientProvider>
       </body>
