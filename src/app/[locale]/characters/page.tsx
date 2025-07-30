@@ -1,14 +1,13 @@
-// src/app/[locale]/characters/page.tsx
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useTranslations, useLocale } from 'next-intl'; // Importa useTranslations e useLocale
+import { useTranslations, useLocale } from 'next-intl';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import styles from './characters.module.css';
-import homeStyles from '../page.module.css'; // Mantido, mas considere refatorar se os estilos forem globais
-import { motion } from 'framer-motion';
+import homeStyles from '../page.module.css';
 import BackToTopButton from '@/components/BackToTopButton';
 
 interface Character {
@@ -22,8 +21,8 @@ interface Character {
 export default function CharactersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const t = useTranslations(); // Hook de tradução
-  const locale = useLocale(); // Hook para o idioma atual
+  const t = useTranslations();
+  const locale = useLocale();
 
   const initialSearchTerm = searchParams.get('name') || '';
   const initialPage = Number(searchParams.get('page')) || 1;
@@ -51,23 +50,20 @@ export default function CharactersPage() {
       } else {
         setCharacters([]);
         setTotalPages(1);
-        // Usa useTranslations para a mensagem de erro
         setError(data.error || t('noResults', { name: name }));
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        console.error('Erro ao buscar personagens:', err.message);
-        setError(t('errorMessage', { message: err.message })); // Exemplo de tradução para erro
+        setError(t('errorMessage', { message: err.message }));
       } else {
-        console.error('Erro desconhecido ao buscar personagens:', err);
-        setError(t('unknownErrorMessage')); // Exemplo de tradução para erro desconhecido
+        setError(t('unknownErrorMessage'));
       }
       setCharacters([]);
       setTotalPages(1);
     } finally {
       setLoading(false);
     }
-  }, [t]); // Adiciona 't' como dependência para useCallback
+  }, [t]);
 
   useEffect(() => {
     const currentName = searchParams.get('name') || '';
@@ -85,7 +81,6 @@ export default function CharactersPage() {
       params.delete('name');
     }
     params.set('page', String(page));
-    // Inclui o prefixo do idioma na URL
     router.push(`/${locale}/characters?${params.toString()}`);
   };
 
@@ -137,20 +132,22 @@ export default function CharactersPage() {
     });
   };
 
+  const { scrollY } = useScroll();
+  const yOffset = useTransform(scrollY, [0, 200], [0, 100]);
+
   return (
     <main className={styles.main}>
-      <div className={styles.background}>
+      <motion.div className={styles.background} style={{ y: yOffset }}>
         <Image
           src="/assets/background.png"
           alt="Rick and Morty Background"
-          layout="fill"
-          objectFit="cover"
-          quality={100}
+          fill
+          style={{ objectFit: 'cover' }}
         />
-      </div>
+      </motion.div>
 
       <div className={homeStyles.logoContainer}>
-        <Link href={`/${locale}`}> {/* Link para a home page com o idioma atual */}
+        <Link href={`/${locale}`}>
           <Image
             src="/assets/logo.png"
             alt="Rick and Morty Logo"
@@ -164,37 +161,34 @@ export default function CharactersPage() {
       <form onSubmit={handleSearchSubmit} className={homeStyles.searchForm}>
         <input
           type="text"
-          name="search"
           placeholder={t('searchPlaceholder')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className={homeStyles.searchInput}
         />
         <button type="submit" className={homeStyles.searchButton}>
-          {t('searchButton')} {/* Usa tradução */}
+          {t('searchButton')}
         </button>
       </form>
 
       {loading && characters.length === 0 ? (
-        <p className={styles.loadingMessage}>{t('loading')}</p> 
+        <p className={styles.loadingMessage}>{t('loading')}</p>
       ) : error ? (
         <p className={styles.error}>{error}</p>
       ) : characters.length === 0 ? (
-        <p className={styles.noResults}>
-          {t('noResults', { name: searchTerm })} 
-        </p>
+        <p className={styles.noResults}>{t('noResults', { name: searchTerm })}</p>
       ) : (
         <div className={styles.gridContainer}>
           <div className={styles.characterGrid}>
             {characters.map((character, index) => (
               <motion.div
                 key={character.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.05 }}
               >
                 <Link
-                  href={`/${locale}/characters/${character.id}`} 
+                  href={`/${locale}/characters/${character.id}`}
                   className={`${styles.characterCard} ${character.status === 'Dead' ? styles.deadCharacterCard : ''}`}
                   onMouseEnter={() => handleMouseEnter(character.id)}
                   onMouseLeave={handleMouseLeave}
@@ -208,7 +202,6 @@ export default function CharactersPage() {
                       alt={character.name}
                       width={200}
                       height={200}
-                      // Aplica a classe condicionalmente
                       className={`${styles.characterImage} ${character.status === 'Dead' ? styles.deadCharacterImage : ''}`}
                     />
                     {hoveredCardId === character.id && (
@@ -233,7 +226,7 @@ export default function CharactersPage() {
                   </div>
                   <div className={styles.info}>
                     <h3>{character.name}</h3>
-                    <p>{t('speciesLabel')}: {character.species}</p> {/* Exemplo de tradução */}
+                    <p>{t('speciesLabel')}: {character.species}</p>
                   </div>
                 </Link>
               </motion.div>
@@ -241,44 +234,18 @@ export default function CharactersPage() {
           </div>
 
           <div className={styles.pagination}>
-            <button
-              onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1 || loading}
-            >
-              «
-            </button>
-            {totalPages > 0 && currentPage - Math.floor(getPageNumbers().length / 2) > 1 && (
-              <>
-                <button onClick={() => handlePageChange(1)}>1</button>
-                {currentPage - Math.floor(getPageNumbers().length / 2) > 2 && (
-                  <span className={styles.paginationEllipsis}>...</span>
-                )}
-              </>
-            )}
-            {getPageNumbers().map((pageNumber) => (
+            <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1 || loading}>«</button>
+            {getPageNumbers().map((page) => (
               <button
-                key={pageNumber}
-                onClick={() => handlePageChange(pageNumber)}
-                className={pageNumber === currentPage ? styles.activePage : ''}
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={page === currentPage ? styles.activePage : ''}
                 disabled={loading}
               >
-                {pageNumber}
+                {page}
               </button>
             ))}
-            {totalPages > 0 && currentPage + Math.floor(getPageNumbers().length / 2) < totalPages && (
-              <>
-                {currentPage + Math.floor(getPageNumbers().length / 2) < totalPages - 1 && (
-                  <span className={styles.paginationEllipsis}>...</span>
-                )}
-                <button onClick={() => handlePageChange(totalPages)}>{totalPages}</button>
-              </>
-            )}
-            <button
-              onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-              disabled={currentPage === totalPages || loading}
-            >
-              »
-            </button>
+            <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages || loading}>»</button>
           </div>
         </div>
       )}
