@@ -1,18 +1,16 @@
-import type { Config } from 'jest';
-
-const config: Config = {
-  preset: 'ts-jest',
+module.exports = {
   testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   transform: {
-    '^.+\\.(ts|tsx)$': 'babel-jest',
+    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
   },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(next-intl)/)', // transforma o next-intl
+  ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(png|jpg|jpeg|gif|webp|svg|mp3|wav)$': '<rootDir>/__mocks__/fileMock.ts',
   },
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testMatch: ['**/__tests__/**/*.test.ts?(x)'],
 };
-
-export default config;
