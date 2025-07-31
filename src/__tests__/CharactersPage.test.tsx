@@ -1,19 +1,25 @@
 import { render, screen } from '@testing-library/react';
 import CharactersPage from '@/app/[locale]/characters/page';
 import { NextIntlClientProvider } from 'next-intl';
-import ptMessages from '@/messages/pt.json';
+import messages from '@/messages/pt.json';
 
-// Use o require() dentro do jest.mock() para evitar o erro de escopo
-jest.mock('next/navigation', () => require('../__mocks__/next-navigation'));
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(() => ({
+    push: jest.fn(),
+  })),
+  useSearchParams: jest.fn(() => new URLSearchParams()),
+  usePathname: jest.fn(() => '/pt/characters'),
+  useParams: jest.fn(() => ({ locale: 'pt' })),
+}));
 
 describe('CharactersPage', () => {
-  it('deve renderizar a página de personagens sem crashar', () => {
+  it('renderiza a página sem crashar', () => {
     render(
-      <NextIntlClientProvider locale="pt" messages={ptMessages}>
+      <NextIntlClientProvider locale="pt" messages={messages}>
         <CharactersPage />
       </NextIntlClientProvider>
     );
-    // Verifique se o placeholder está presente para confirmar a renderização
+
     expect(screen.getByPlaceholderText(/Buscar personagem/i)).toBeInTheDocument();
   });
 });
