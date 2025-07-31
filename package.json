@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest"
-    // "test": "node --max-old-space-size=4096 ./node_modules/.bin/jest"
+    "test": "jest",
+    "test:mem": "node --max-old-space-size=4096 ./node_modules/.bin/jest"
   },
   "dependencies": {
     "framer-motion": "^12.23.6",
