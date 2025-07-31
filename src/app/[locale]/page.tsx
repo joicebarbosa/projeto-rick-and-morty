@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations, useLocale } from 'next-intl'; // Importa useLocale
+import { useTranslations, useLocale } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -13,7 +13,7 @@ export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
   const t = useTranslations();
-  const locale = useLocale(); // Obtém o idioma atual
+  const locale = useLocale();
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -23,9 +23,9 @@ export default function HomePage() {
     event.preventDefault();
     const trimmedTerm = searchTerm.trim();
     if (trimmedTerm) {
-      router.push(`/${locale}/characters?name=${trimmedTerm}`); // Usa o idioma atual
+      router.push(`/${locale}/characters?name=${trimmedTerm}`);
     } else {
-      router.push(`/${locale}/characters`); // Usa o idioma atual
+      router.push(`/${locale}/characters`);
     }
   };
 
@@ -43,8 +43,8 @@ export default function HomePage() {
         <Image
           src="/assets/background.png"
           alt="Rick and Morty Background"
-          layout="fill"
-          objectFit="cover"
+          fill // Substitui layout="fill"
+          style={{ objectFit: 'cover' }} // Substitui objectFit="cover"
           quality={100}
         />
       </motion.div>
@@ -55,7 +55,7 @@ export default function HomePage() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <Link href={`/${locale}`}> {/* Link para a home page com o idioma atual */}
+        <Link href={`/${locale}`}>
           <Image
             src="/assets/logo.png"
             alt="Rick and Morty Logo"
@@ -65,6 +65,9 @@ export default function HomePage() {
           />
         </Link>
       </motion.div>
+
+      {/* Adicionado o cabeçalho para o teste encontrar o título */}
+      <h1 className={styles.title}>{t('homePage.title')}</h1>
 
       <motion.form
         onSubmit={handleSearchSubmit}
@@ -80,18 +83,18 @@ export default function HomePage() {
           onChange={handleSearchChange}
           className={styles.searchInput}
         />
-       <motion.button
-              whileHover={{ scale: 1.05, backgroundColor: '#00ffaa' }}
-              whileTap={{ scale: 0.95 }}
-              type="submit"
-              className={styles.searchButton}
->
-               {t('searchButton')}
-       </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.05, backgroundColor: '#00ffaa' }}
+          whileTap={{ scale: 0.95 }}
+          type="submit"
+          className={styles.searchButton}
+        >
+          {t('searchButton')}
+        </motion.button>
       </motion.form>
 
-    <button
-          onClick={() => {
+      <button
+        onClick={() => {
           const audio = new Audio('/sounds/click.wav');
           audio.volume = 0.5;
           audio.play().catch((err) => console.error('Erro ao tocar som:', err));
@@ -99,11 +102,6 @@ export default function HomePage() {
       >
         Testar som
       </button>
-
-
     </motion.main>
-
-
-
   );
 }
