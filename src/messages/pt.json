@@ -1,10 +1,36 @@
 {
-  "searchPlaceholder": "Buscar personagem",
-  "searchButton": "Buscar",
-  "loading": "Carregando personagens...",
-  "noResults": "Nenhum personagem encontrado com o nome \"{name}\".",
-  "backToTop": "↑ Topo",
-  "speciesLabel": "Espécie",
-  "errorMessage": "Falha ao carregar personagens: {message}",
-  "unknownErrorMessage": "Ocorreu um erro desconhecido ao carregar os personagens."
+  "homePage": {
+    "title": "Projeto Rick and Morty",
+    "searchPlaceholder": "Pesquisar por personagem...",
+    "searchButton": "Pesquisar"
+  },
+  "characterCard": {
+    "gender": "Gênero:",
+    "status": "Status:",
+    "species": "Espécie:",
+    "origin": "Origem:",
+    "lastLocation": "Última localização:",
+    "episodesCount": "Episódios:"
+  },
+  "detailsPage": {
+    "gender": "Gênero",
+    "status": "Status",
+    "species": "Espécie",
+    "origin": "Origem",
+    "lastLocation": "Última localização",
+    "backButton": "Voltar para a lista",
+    "loading": "Carregando..."
+  },
+  "charactersPage": {
+    "searchPlaceholder": "Buscar personagem",
+    "title": "Personagens de Rick e Morty",
+    "loading": "Carregando...",
+    "notFound": "Nenhum personagem encontrado."
+  },
+  "errorPage": {
+    "title": "Opa! Algo deu errado.",
+    "subtitle": "A página que você está procurando não foi encontrada.",
+    "backButton": "Voltar para a página inicial"
+  }
 }
+

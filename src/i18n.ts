@@ -7,12 +7,15 @@ export const defaultLocale = 'pt';
 export type Locale = (typeof locales)[number];
 
 export default getRequestConfig(async ({ locale }) => {
-  // Ensure locale is always a valid string from locales
-  const selectedLocale = locales.includes(locale as Locale) ? (locale as Locale) : defaultLocale;
-  if (!locales.includes(selectedLocale)) notFound();
+  // Garantimos que a locale é válida.
+  // Se não for, a função notFound() interrompe a execução.
+  if (!locales.includes(locale as Locale)) {
+    notFound();
+  }
 
   return {
-    locale: selectedLocale,
-    messages: (await import(`./messages/${selectedLocale}.json`)).default,
+    locale,
+    // Carregamento dinâmico otimizado para o App Router
+    messages: (await import(`./messages/${locale}.json`)).default,
   };
 });
