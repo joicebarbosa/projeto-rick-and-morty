@@ -7,7 +7,9 @@ jest.mock('next/navigation', () => ({
   useRouter: jest.fn(() => ({
     push: jest.fn(),
   })),
-  useSearchParams: jest.fn(() => new URLSearchParams()),
+  useSearchParams: jest.fn(() => ({
+  get: jest.fn(() => ''), // Retorna string fixa
+})),
   usePathname: jest.fn(() => '/pt/characters'),
   useParams: jest.fn(() => ({ locale: 'pt' })),
 }));
