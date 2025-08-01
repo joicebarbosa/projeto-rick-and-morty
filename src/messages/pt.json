@@ -22,9 +22,11 @@
     "loading": "Carregando..."
   },
   "charactersPage": {
-    "searchPlaceholder": "Buscar personagem",
-    "title": "Personagens de Rick e Morty",
+    "searchPlaceholder": "Buscar personagens...",
+    "searchButton": "Buscar",
     "loading": "Carregando...",
+    "noResults": "Nenhum resultado encontrado para o personagem \"{name}\".",
+    "title": "Personagens de Rick e Morty",
     "notFound": "Nenhum personagem encontrado."
   },
   "errorPage": {
@@ -33,4 +35,3 @@
     "backButton": "Voltar para a página inicial"
   }
 }
-
