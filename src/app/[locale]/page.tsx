@@ -2,9 +2,11 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
 import { motion } from "framer-motion";
-import styles from "./page.module.css";
+import Image from "next/image";
+
+// Removemos a importação do CSS Module, pois o estilo será aplicado via globals.css
+// import styles from "./page.module.css"; 
 
 export default function HomePage() {
   const t = useTranslations("homePage");
@@ -21,12 +23,12 @@ export default function HomePage() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className="home-container">
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className={styles.header}
+        className="header"
       >
         <Image
           src="/logo.svg"
@@ -35,14 +37,14 @@ export default function HomePage() {
           height={100}
           priority
         />
-        <h1 className={styles.title}>{t("title")}</h1>
+        <h1 className="title">{t("title")}</h1>
       </motion.div>
 
       <motion.form
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
-        className={styles.searchForm}
+        className="searchForm"
         onSubmit={handleSearchSubmit}
       >
         <input
@@ -50,13 +52,13 @@ export default function HomePage() {
           placeholder={t("searchPlaceholder")}
           value={searchTerm}
           onChange={handleSearchChange}
-          className={styles.searchInput}
+          className="searchInput"
         />
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           type="submit"
-          className={styles.searchButton}
+          className="searchButton"
         >
           {t("searchButton")}
         </motion.button>

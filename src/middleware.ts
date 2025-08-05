@@ -1,22 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
-import { locales, defaultLocale } from '@/i18n';
+import { locales, defaultLocale } from './i18n';
 
-const intlMiddleware = createMiddleware({
-  locales,
-  defaultLocale,
+export default createMiddleware({
+  // Um caminho de URL que é prefixado com um dos locais suportados.
+  // Por exemplo, /pt, /en
+  locales: locales,
+  defaultLocale: defaultLocale,
+  localePrefix: 'as-needed',
 });
 
-export function middleware(request: NextRequest) {
-  // Se estiver na raiz '/', redireciona para '/pt'
-  if (request.nextUrl.pathname === '/') {
-    return NextResponse.redirect(new URL(`/${defaultLocale}`, request.url));
-  }
-
-  // Deixa o next-intl cuidar do resto
-  return intlMiddleware(request);
-}
-
 export const config = {
-  matcher: ['/((?!_next|favicon.ico|.*\\..*).*)'],
+  // Ignora arquivos no /public, /api e Next.js internals
+  // Os caminhos `/api|/_next/|` são padrões
+  // Você pode adicionar mais arquivos, como `/images|`, se necessário
+  matcher: ['/((?!api|_next|images|favicon.ico).*)'],
 };

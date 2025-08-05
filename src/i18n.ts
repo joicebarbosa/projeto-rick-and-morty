@@ -1,21 +1,24 @@
-// src/i18n.ts
-import { getRequestConfig } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { getRequestConfig } from 'next-intl/server';
+import { headers } from 'next/headers'; // Importação necessária
 
-export const locales = ['pt', 'en'] as const;
-export const defaultLocale = 'pt';
+// Defina as locales que você suporta
+export const locales = ['pt'] as const;
 export type Locale = (typeof locales)[number];
 
-export default getRequestConfig(async ({ locale }) => {
-  // Garantimos que a locale é válida.
-  // Se não for, a função notFound() interrompe a execução.
+// Exporte a locale padrão
+export const defaultLocale = locales[0];
+
+export default getRequestConfig(async () => {
+  const localeHeader = headers().get('X-NEXT-INTL-LOCALE');
+  const locale = localeHeader || defaultLocale;
+
   if (!locales.includes(locale as Locale)) {
     notFound();
   }
 
   return {
-    locale,
-    // Carregamento dinâmico otimizado para o App Router
+    locale, // É necessário retornar a locale a partir de getRequestConfig
     messages: (await import(`./messages/${locale}.json`)).default,
   };
 });
