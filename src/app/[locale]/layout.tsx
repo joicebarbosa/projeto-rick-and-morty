@@ -1,36 +1,33 @@
-import { notFound } from "next/navigation";
-import { NextIntlClientProvider } from "next-intl";
-import i18n, { locales } from "@/i18n";
-import type { Metadata } from "next";
-import "../globals.css";
+import { ReactNode } from 'react';
+import { NextIntlClientProvider } from 'next-intl';
+import i18n from '@/i18n'; // sua função está correta
+import { notFound } from 'next/navigation';
+
+export const metadata = {
+  title: 'Rick and Morty',
+};
 
 interface Props {
-  children: React.ReactNode;
+  children: ReactNode;
   params: { locale: string };
 }
 
-export const metadata: Metadata = {
-  title: "Rick and Morty App",
-  description: "A challenge to build a Rick and Morty app.",
-};
+// Esta função pode ser async sem problemas — se usada corretamente
+export default async function LocaleLayout({
+  children,
+  params: { locale },
+}: Props) {
+  // Carrega as mensagens com base no locale
+  const config = await i18n({ locale }).catch(() => null);
 
-export default async function LocaleLayout({ children, params }: Props) {
-  // A próxima linha vai carregar o arquivo de tradução.
-  // Use a função `getRequestConfig` diretamente, que já faz a validação da locale.
-  const config = await i18n({ locale: params.locale }).catch(() => null);
-
-  // Se a configuração não for encontrada, significa que a locale é inválida.
   if (!config) {
     notFound();
   }
 
   return (
-    <html lang={params.locale}>
+    <html lang={locale}>
       <body>
-        <NextIntlClientProvider
-          locale={params.locale}
-          messages={config.messages}
-        >
+        <NextIntlClientProvider locale={locale} messages={config.messages}>
           {children}
         </NextIntlClientProvider>
       </body>

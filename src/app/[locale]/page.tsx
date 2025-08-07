@@ -31,7 +31,7 @@ export default function HomePage() {
         className="header"
       >
         <Image
-          src="/logo.svg"
+          src="/logo.png"
           alt="Rick and Morty Logo"
           width={250}
           height={100}
